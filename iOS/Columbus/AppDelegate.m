@@ -13,19 +13,49 @@
 @end
 
 @implementation AppDelegate
-
+@synthesize locationManager;
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     [self.window makeKeyAndVisible];
     
+
+    
+    UIMutableUserNotificationAction *notificationAction2 = [[UIMutableUserNotificationAction alloc] init];
+    notificationAction2.identifier = @"Reject";
+    notificationAction2.title = @"Boring!";
+    notificationAction2.activationMode = UIUserNotificationActivationModeBackground;
+    notificationAction2.destructive = YES;
+    notificationAction2.authenticationRequired = NO;
+    
+    
+    
+    UIMutableUserNotificationCategory *notificationCategory = [[UIMutableUserNotificationCategory alloc] init];
+    notificationCategory.identifier = @"Boring";
+    [notificationCategory setActions:@[notificationAction2] forContext:UIUserNotificationActionContextDefault];
+
+    
+    NSSet *categories = [NSSet setWithObjects:notificationCategory, nil];
+    
+    UIUserNotificationType notificationType = UIUserNotificationTypeBadge | UIUserNotificationTypeSound | UIUserNotificationTypeAlert;
+    UIUserNotificationSettings *notificationSettings = [UIUserNotificationSettings settingsForTypes:notificationType categories:categories];
+    
+    [[UIApplication sharedApplication] registerUserNotificationSettings:notificationSettings];
+    
+    
+    locationManager = [[CLLocationManager alloc] init];
+    locationManager.distanceFilter = 40;
+    locationManager.desiredAccuracy = kCLLocationAccuracyBest;
+    [locationManager requestAlwaysAuthorization];
+    
+    NSLog(@"%f",locationManager.location.coordinate.longitude);
+    locationManager.delegate = self;
     
     MainViewController *firstView = [[MainViewController alloc] init];
     
     UINavigationController *navigationController= [[UINavigationController alloc] initWithRootViewController:firstView];
     
     self.window.rootViewController = navigationController;
-    
     
     
     return YES;
@@ -36,13 +66,43 @@
     // Use this method to pause ongoing tasks, disable timers, and throttle down OpenGL ES frame rates. Games should use this method to pause the game.
 }
 
-- (void)applicationDidEnterBackground:(UIApplication *)application {
-    // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
-    // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
+//starts when the application switches to the background
+- (void)applicationDidEnterBackground:(UIApplication *)application
+{
+    NSLog(@"background started");
+    [locationManager requestAlwaysAuthorization];
+    [locationManager startUpdatingLocation];
 }
 
-- (void)applicationWillEnterForeground:(UIApplication *)application {
-    // Called as part of the transition from the background to the inactive state; here you can undo many of the changes made on entering the background.
+//starts automatically with locationManager
+-(void)locationManager:(CLLocationManager *)manager didUpdateToLocation:(CLLocation *)newLocation fromLocation:(CLLocation *)oldLocation{
+    NSLog(@"Location: %f, %f", newLocation.coordinate.longitude, newLocation.coordinate.latitude);
+    
+    NSMutableURLRequest *request =[NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"https://api.sendgrid.com/api/mail.send.json"]];
+    [request setHTTPMethod:@"POST"];
+    
+    NSString *post = nil;
+    NSData *postData = [post dataUsingEncoding:NSASCIIStringEncoding allowLossyConversion:YES];
+    [request setHTTPBody:postData];
+    
+    NSURLResponse *response;
+    NSError *err;
+    NSData *responseData = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&err];
+    
+    NSString *result =[[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding];
+    
+    
+    UILocalNotification *notification = [[UILocalNotification alloc] init];
+    notification.fireDate = [NSDate date];
+    notification.alertBody = result;
+    notification.category=@"Boring";
+    [[UIApplication sharedApplication] scheduleLocalNotification:notification];
+}
+
+//starts when application switches back from background
+- (void)applicationWillEnterForeground:(UIApplication *)application
+{
+    [locationManager stopUpdatingLocation];
 }
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {
@@ -52,5 +112,8 @@
 - (void)applicationWillTerminate:(UIApplication *)application {
     // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
 }
+
+
+
 
 @end
