@@ -13,6 +13,7 @@
 		51C053481A03FC8000A1C15C /* ColumbusTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 51C053471A03FC8000A1C15C /* ColumbusTests.m */; };
 		51C053551A03FCAD00A1C15C /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 51C053521A03FCAD00A1C15C /* AppDelegate.m */; };
 		51C053561A03FCAD00A1C15C /* MainViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 51C053541A03FCAD00A1C15C /* MainViewController.m */; };
+		51CF87261A041ABA001E612E /* Echterdingen.gpx in Resources */ = {isa = PBXBuildFile; fileRef = 51CF87251A041ABA001E612E /* Echterdingen.gpx */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -38,6 +39,7 @@
 		51C053521A03FCAD00A1C15C /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		51C053531A03FCAD00A1C15C /* MainViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MainViewController.h; sourceTree = "<group>"; };
 		51C053541A03FCAD00A1C15C /* MainViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MainViewController.m; sourceTree = "<group>"; };
+		51CF87251A041ABA001E612E /* Echterdingen.gpx */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = Echterdingen.gpx; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -61,6 +63,7 @@
 		51C0531F1A03FC8000A1C15C = {
 			isa = PBXGroup;
 			children = (
+				51CF87251A041ABA001E612E /* Echterdingen.gpx */,
 				51C0532A1A03FC8000A1C15C /* Columbus */,
 				51C053441A03FC8000A1C15C /* ColumbusTests */,
 				51C053291A03FC8000A1C15C /* Products */,
@@ -165,6 +168,11 @@
 				TargetAttributes = {
 					51C053271A03FC8000A1C15C = {
 						CreatedOnToolsVersion = 6.1;
+						SystemCapabilities = {
+							com.apple.BackgroundModes = {
+								enabled = 1;
+							};
+						};
 					};
 					51C053401A03FC8000A1C15C = {
 						CreatedOnToolsVersion = 6.1;
@@ -196,6 +204,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				51CF87261A041ABA001E612E /* Echterdingen.gpx in Resources */,
 				51C0533C1A03FC8000A1C15C /* LaunchScreen.xib in Resources */,
 				51C053391A03FC8000A1C15C /* Images.xcassets in Resources */,
 			);
@@ -334,6 +343,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				INFOPLIST_FILE = Columbus/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -344,6 +354,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				INFOPLIST_FILE = Columbus/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -402,6 +413,7 @@
 				51C0534D1A03FC8000A1C15C /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		51C0534E1A03FC8000A1C15C /* Build configuration list for PBXNativeTarget "ColumbusTests" */ = {
 			isa = XCConfigurationList;
@@ -410,6 +422,7 @@
 				51C053501A03FC8000A1C15C /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

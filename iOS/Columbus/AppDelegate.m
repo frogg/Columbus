@@ -13,12 +13,27 @@
 @end
 
 @implementation AppDelegate
-
+@synthesize locationManager;
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     [self.window makeKeyAndVisible];
     
+    UIUserNotificationType types = UIUserNotificationTypeBadge |
+    UIUserNotificationTypeSound | UIUserNotificationTypeAlert;
+    
+    UIUserNotificationSettings *mySettings =
+    [UIUserNotificationSettings settingsForTypes:types categories:nil];
+    
+    [[UIApplication sharedApplication] registerUserNotificationSettings:mySettings];
+    
+    locationManager = [[CLLocationManager alloc] init];
+    locationManager.distanceFilter = 40;
+    locationManager.desiredAccuracy = kCLLocationAccuracyBest;
+    [locationManager requestAlwaysAuthorization];
+    
+    NSLog(@"%f",locationManager.location.coordinate.longitude);
+    locationManager.delegate = self;
     
     MainViewController *firstView = [[MainViewController alloc] init];
     
@@ -26,8 +41,7 @@
     
     self.window.rootViewController = navigationController;
     
-    
-    
+
     return YES;
 }
 
@@ -36,13 +50,41 @@
     // Use this method to pause ongoing tasks, disable timers, and throttle down OpenGL ES frame rates. Games should use this method to pause the game.
 }
 
-- (void)applicationDidEnterBackground:(UIApplication *)application {
-    // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
-    // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
+//starts when the application switches to the background
+- (void)applicationDidEnterBackground:(UIApplication *)application
+{
+    NSLog(@"background started");
+    [locationManager startUpdatingLocation];
 }
 
-- (void)applicationWillEnterForeground:(UIApplication *)application {
-    // Called as part of the transition from the background to the inactive state; here you can undo many of the changes made on entering the background.
+//starts automatically with locationManager
+-(void)locationManager:(CLLocationManager *)manager didUpdateToLocation:(CLLocation *)newLocation fromLocation:(CLLocation *)oldLocation{
+    NSLog(@"Location: %f, %f", newLocation.coordinate.longitude, newLocation.coordinate.latitude);
+    
+    NSMutableURLRequest *request =[NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"http://google.com"]];
+    [request setHTTPMethod:@"POST"];
+    
+    NSString *post = nil;
+    NSData *postData = [post dataUsingEncoding:NSASCIIStringEncoding allowLossyConversion:YES];
+    [request setHTTPBody:postData];
+    
+    NSURLResponse *response;
+    NSError *err;
+    NSData *responseData = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&err];
+    
+    NSString *result =[[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding];
+    
+    
+    UILocalNotification *notification = [[UILocalNotification alloc] init];
+    notification.fireDate = [NSDate date];
+    notification.alertBody = result;
+    [[UIApplication sharedApplication] scheduleLocalNotification:notification];
+}
+
+//starts when application switches back from background
+- (void)applicationWillEnterForeground:(UIApplication *)application
+{
+    [locationManager stopUpdatingLocation];
 }
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {
@@ -52,5 +94,8 @@
 - (void)applicationWillTerminate:(UIApplication *)application {
     // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
 }
+
+
+
 
 @end
