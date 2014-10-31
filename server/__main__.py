@@ -22,13 +22,17 @@ class pushNotificationResponse():
             'gps': self.gps,
             'typ': self.typ,
             'schlagworte': self.schlagworte,
-            'requestid': self.requestid
+            'requestid': self.requestid,
+            'pageid': self.pageid
         }
         return json
 
 def geosearch(latitude, longtitude, gtype,radius):
     return apicall('de','query','json','geosearch',"&type={0}&gsradius={3}&gscoord={1}|{2}".format(gtype, latitude,longtitude,radius))
 
+def getSite(siteID):
+
+    pass
 
 def apicall(language, action, response_format, listParams, specialValues):
     r = requests.get("https://{0}.wikipedia.org/w/api.php?action={1}&format={2}&list={3}{4}".format(language,action,response_format,listParams,specialValues))
@@ -66,7 +70,7 @@ def getPushLocations(latitude, longtitude):
 @app.route('/get/locations/<latitude>/<longtitude>')
 def pushLocations(latitude, longtitude):
     locations = []
-    for i in geosearch(latitude, longtitude, 'json'):
+    for i in geosearch(latitude, longtitude, 'landmark', 1000):
         if len(locations)>5:
             break
         entry =pushNotificationResponse(i.get('title'),
@@ -79,7 +83,9 @@ def pushLocations(latitude, longtitude):
                                          i.get('pageid'))
 
         locations.append(entry.toDict())
-    return jsonify({'notes':locations}), 200
+    for location in locations:
+        getSite(location.pageid)
+    return "sutff"
 '''
 @app.route('/get/userID')
 def pushLocations(latitude, longtitude):
