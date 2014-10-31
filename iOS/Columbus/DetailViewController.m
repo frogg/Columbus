@@ -1,33 +1,29 @@
 //
-//  MainViewController.m
-//  Hackathon Stuttgart 2014
+//  DetailViewController.m
+//  Columbus
 //
 //  Created by Frederik Riedel on 31.10.14.
 //  Copyright (c) 2014 Frederik Riedel. All rights reserved.
 //
 
-#import "MainViewController.h"
+#import "DetailViewController.h"
 
-@interface MainViewController ()
+@interface DetailViewController ()
 
 @end
 
-@implementation MainViewController
+@implementation DetailViewController
 
 - (void)viewDidLoad {
-    [self.navigationController setNavigationBarHidden:YES animated:NO];
     [super viewDidLoad];
-    self.title=@"Columbus";
-    self.view.backgroundColor=[UIColor whiteColor];
-    
+    self.view.backgroundColor=[UIColor blueColor];
     
     UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
-    [button addTarget:self action:@selector(deatils) forControlEvents:UIControlEventTouchUpInside];
-    [button setTitle:@"Details" forState:UIControlStateNormal];
+    [button addTarget:self action:@selector(back) forControlEvents:UIControlEventTouchUpInside];
+    [button setTitle:@"Zurück" forState:UIControlStateNormal];
     button.backgroundColor=[UIColor greenColor];
     button.frame=CGRectMake(100, 100, 100, 100);
     [self.view addSubview:button];
-    
     
     // Do any additional setup after loading the view.
 }
@@ -37,16 +33,9 @@
     // Dispose of any resources that can be recreated.
 }
 
--(void) deatils {
-    DetailViewController *suche = [[DetailViewController alloc] init];
-    
-    
-    suche.modalTransitionStyle = UIModalTransitionStyleFlipHorizontal;
-    self.navigationController.modalPresentationStyle = UIModalPresentationCurrentContext;
-    
-    [self.navigationController presentViewController:suche animated:YES completion: nil];
+-(void) back {
+    [self dismissModalViewControllerAnimated:YES];
 }
-    
 
 /*
 #pragma mark - Navigation
