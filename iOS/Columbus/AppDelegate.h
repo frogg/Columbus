@@ -8,11 +8,12 @@
 
 #import <UIKit/UIKit.h>
 #import "MainViewController.h"
+@import CoreLocation;
 
-@interface AppDelegate : UIResponder <UIApplicationDelegate>
+@interface AppDelegate : UIResponder <UIApplicationDelegate,CLLocationManagerDelegate>
 
 @property (strong, nonatomic) UIWindow *window;
-
+@property(nonatomic) CLLocationManager *locationManager;
 
 @end
 
