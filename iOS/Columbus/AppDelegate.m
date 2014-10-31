@@ -19,13 +19,29 @@
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     [self.window makeKeyAndVisible];
     
-    UIUserNotificationType types = UIUserNotificationTypeBadge |
-    UIUserNotificationTypeSound | UIUserNotificationTypeAlert;
+
     
-    UIUserNotificationSettings *mySettings =
-    [UIUserNotificationSettings settingsForTypes:types categories:nil];
+    UIMutableUserNotificationAction *notificationAction2 = [[UIMutableUserNotificationAction alloc] init];
+    notificationAction2.identifier = @"Reject";
+    notificationAction2.title = @"Boring!";
+    notificationAction2.activationMode = UIUserNotificationActivationModeBackground;
+    notificationAction2.destructive = YES;
+    notificationAction2.authenticationRequired = NO;
     
-    [[UIApplication sharedApplication] registerUserNotificationSettings:mySettings];
+    
+    
+    UIMutableUserNotificationCategory *notificationCategory = [[UIMutableUserNotificationCategory alloc] init];
+    notificationCategory.identifier = @"Boring";
+    [notificationCategory setActions:@[notificationAction2] forContext:UIUserNotificationActionContextDefault];
+
+    
+    NSSet *categories = [NSSet setWithObjects:notificationCategory, nil];
+    
+    UIUserNotificationType notificationType = UIUserNotificationTypeBadge | UIUserNotificationTypeSound | UIUserNotificationTypeAlert;
+    UIUserNotificationSettings *notificationSettings = [UIUserNotificationSettings settingsForTypes:notificationType categories:categories];
+    
+    [[UIApplication sharedApplication] registerUserNotificationSettings:notificationSettings];
+    
     
     locationManager = [[CLLocationManager alloc] init];
     locationManager.distanceFilter = 40;
@@ -41,7 +57,7 @@
     
     self.window.rootViewController = navigationController;
     
-
+    
     return YES;
 }
 
@@ -54,6 +70,7 @@
 - (void)applicationDidEnterBackground:(UIApplication *)application
 {
     NSLog(@"background started");
+    [locationManager requestAlwaysAuthorization];
     [locationManager startUpdatingLocation];
 }
 
@@ -61,7 +78,7 @@
 -(void)locationManager:(CLLocationManager *)manager didUpdateToLocation:(CLLocation *)newLocation fromLocation:(CLLocation *)oldLocation{
     NSLog(@"Location: %f, %f", newLocation.coordinate.longitude, newLocation.coordinate.latitude);
     
-    NSMutableURLRequest *request =[NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"http://google.com"]];
+    NSMutableURLRequest *request =[NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"https://api.sendgrid.com/api/mail.send.json"]];
     [request setHTTPMethod:@"POST"];
     
     NSString *post = nil;
@@ -78,6 +95,7 @@
     UILocalNotification *notification = [[UILocalNotification alloc] init];
     notification.fireDate = [NSDate date];
     notification.alertBody = result;
+    notification.category=@"Boring";
     [[UIApplication sharedApplication] scheduleLocalNotification:notification];
 }
 
