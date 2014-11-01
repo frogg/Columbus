@@ -48,10 +48,10 @@ def getSchlagworter(title, url):
     z = 0
     keywords= []
     for word in z['keywords']:
-        if z < 5
+        if z < 5:
             if title in word['text']:
                 print("It's there!!!")
-                z++
+                z+= 1
             else:
                 keywords.append(word['text'])
         else:
@@ -95,12 +95,13 @@ def pushLocations(latitude, longtitude):
     for location in locations:
         getSite(location.pageid)
     return "sutff"
-'''
-@app.route('/get/userID')
-def pushLocations(latitude, longtitude):
-    return wikipedia.geosearch(latitude, longtitude)
-    return 'Hello World!'
 
+
+@app.route('/get/userID')
+def getUserID():
+    return "QUAPPI RULES"
+    
+'''
 @app.route('/get/Info/<latitude>/<longtitude>')
 def pushLocations(latitude, longtitude):
     return wikipedia.geosearch(latitude, longtitude)
