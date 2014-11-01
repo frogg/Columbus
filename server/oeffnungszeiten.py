@@ -1,21 +1,64 @@
+import math
 import requests
 import json
+
+def calculateLikes(likes, dislikes, totalLikeTime):
+
+    likeMultiplier = 4
+    if isinstance(likes, int) and isinstance(dislikes, int) and isinstance(totalLikeTime, int):
+        totalVotes = likes + dislikes
+        averageTime = totalLikeTime / totalVotes
+        timeLikes = totalLikeTime / (averageTime*likeMultiplier)
+        print (timeLikes)
+        totalLikes = (likes + timeLikes - dislikes)*20
+        if totalLikes > 1000:
+        	totalLikes = 1000
+        return totalLikes
+    else:
+        return None
 
 def getPlacesAtLocation(lattitude, longitude, radius, types):
     try:
         types = "|".join(types)
         result = {}
         shittyHardcodedBlacklist = ["establishment"]
+        shittyHardcodedTierlist1 = [""]
+        shittyHardcodedTierlist2 = [""]
+        shittyHardcodedTierlist3 = [""]
         try:
             r = requests.get('https://maps.googleapis.com/maps/api/place/radarsearch/json?location='+str(lattitude)+','+str(longitude)+'&radius='+str(radius)+'&types='+types+'&key=AIzaSyDW9MwGaplwwDRo9Fn2uZweW8LN1tuomBQ').json()
             #r = requests.get('https://maps.googleapis.com/maps/api/place/textsearch/json?query=bw+bank+stuttgart&key=AIzaSyDW9MwGaplwwDRo9Fn2uZweW8LN1tuomBQ').json()
             placeID = r['results'][0]['place_id']
             r = requests.get('https://maps.googleapis.com/maps/api/place/details/json?placeid='+placeID+'&key=AIzaSyDW9MwGaplwwDRo9Fn2uZweW8LN1tuomBQ').json()
+            
             try:
+                result['address'] = r['result']['formatted_address']
+            except:
+                result['address'] = None
+
+            try:
+                typeReturn2 = None
+                typeReturn3 = None
                 for x in r['result']['types']:
                     if x not in shittyHardcodedBlacklist:
-                        result['types'] = x
-                        break
+                        if x in shittyHardcodedTierlist1:
+                            result['types'] = x
+                            break
+                        if x in shittyHardcodedTierlist2:
+                            if typeReturn2 == None:
+                                typeReturn2 = x
+                        if x in shittyHardcodedTierlist3:
+                            if typeReturn3 == None:
+                                typeReturn3 = x
+                    if typeReturn2 == None:
+                        if typeReturn3 == None:
+                            result['types'] = None
+                        else:
+                            result['types'] = typeReturn3
+                    else: 
+                        result['types'] = typeReturn2
+
+
 
             except KeyError:
                 result['types'] = None
@@ -69,4 +112,5 @@ def getPlacesAtLocation(lattitude, longitude, radius, types):
     except ConnectionError as e:
         return None
 
-print(getPlacesAtLocation(48.713053,9.165552,100,["bank"]))
+
+print(getPlacesAtLocation(48.7825, 9.17015, 200, ['museum']))
