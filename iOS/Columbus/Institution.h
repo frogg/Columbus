@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
+#import "IP.h"
 @import CoreLocation;
 
 @interface Institution : NSObject
@@ -25,6 +26,6 @@
 @property(readwrite) NSString *beschreibung;
 
 -(void) imageUsingBlock:(void (^)(UIImage *image))block;
-
+-(void) descriptionUsingBlock:(void (^)(NSString *beschriebung))block;
 
 @end

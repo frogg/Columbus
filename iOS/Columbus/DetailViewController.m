@@ -28,15 +28,31 @@
             [self performSelectorInBackground:@selector(blurImageInBackground:) withObject:image];
         };
         
-        [institution imageUsingBlock:block];
+        [institution performSelectorInBackground:@selector(imageUsingBlock:) withObject:block];
+        
+        
+        
         
         [self.view addSubview:institutionImage];
         
         webView = [[UIWebView alloc] initWithFrame:CGRectMake(0, 100, self.view.frame.size.width, self.view.frame.size.height-100)];
         [self.view addSubview:webView];
-        [webView loadHTMLString:[self getHTMlString] baseURL:nil];
+        
+        
+        
+        
         webView.opaque=NO;
         webView.backgroundColor=[UIColor clearColor];
+        
+        void (^blocki)(NSString *) = ^(NSString *beschreibung) {
+            self.institution.beschreibung=beschreibung;
+            [webView loadHTMLString:[self getHTMlString] baseURL:nil];
+        };
+        
+        
+        [institution performSelectorInBackground:@selector(descriptionUsingBlock:) withObject:blocki];
+        
+        
         
         UIButton *back = [UIButton buttonWithType:UIButtonTypeCustom];
         [back addTarget:self action:@selector(back) forControlEvents:UIControlEventTouchUpInside];
@@ -44,7 +60,7 @@
         back.frame=CGRectMake(15, 35, 24, 24);
         [self.view addSubview:back];
         
-        
+        [webView loadHTMLString:[self getHTMlString] baseURL:nil];
         
     }
     return self;
@@ -71,7 +87,7 @@
 
 -(NSString *) getHTMlString {
     
-    return [NSString stringWithFormat:@"<html><head><style type=\"text/css\">tit {	font-size: 27;    font-family: HelveticaNeue-Medium;    color: #BD997C;} sub {	font-size: 17;    font-family: HelveticaNeue-light;    color: #BD997C;}  txt {	font-size: 17;    font-family: HelveticaNeue-light;    color: #000000;}    </style></head><center><tit>%@</tit><br><sub>%@</sub><br><br><br><br></center><txt>%@</txt></br></html>",self.institution.name,self.institution.type,self.institution.beschreibung];
+    return [NSString stringWithFormat:@"<html><head><style type=\"text/css\">a{color: #BD997C;}  tit {	font-size: 27;    font-family: HelveticaNeue-Medium;    color: #BD997C;} sub {	font-size: 17;    font-family: HelveticaNeue-light;    color: #BD997C;}  txt {	font-size: 17;    font-family: HelveticaNeue-light;    color: #000000;}    </style></head><center><tit>%@</tit><br><sub>%@</sub><br><br><br><br></center><txt>%@<br><br><a href=''><i>Read more on  Wikipedia.</i></a><br><br><br>Hours of opening:<br>SU: 10:00 - 19:00</txt></br></html>",self.institution.name,self.institution.type,self.institution.beschreibung];
 }
 
 -(UIStatusBarStyle)preferredStatusBarStyle{

@@ -24,4 +24,27 @@
     }
 }
 
+-(void) descriptionUsingBlock:(void (^)(NSString *beschriebung))block {
+    if(self.beschreibung) {
+        block(self.beschreibung);
+    }
+    NSMutableURLRequest *request =[NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://%@/get/details/16992814",[IP getIP]]]];
+    //    NSMutableURLRequest *request =[NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://google.de/%f/%f",newLocation.coordinate.latitude,newLocation.coordinate.longitude]]];
+    
+    [request setHTTPMethod:@"GET"];
+    
+    NSString *post = nil;
+    NSData *postData = [post dataUsingEncoding:NSASCIIStringEncoding allowLossyConversion:YES];
+    [request setHTTPBody:postData];
+    
+    NSURLResponse *response;
+    NSError *err;
+    NSData *responseData = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&err];
+    //NSString *result =[[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding];
+    NSDictionary *dic = [NSJSONSerialization JSONObjectWithData:responseData options:0 error:nil];
+    block([dic objectForKey:@"summary"]);
+
+}
+
+
 @end
