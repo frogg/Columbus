@@ -8,12 +8,11 @@ def hi():
     return "hey"
 
 class pushNotificationResponse():
-    def __init__(self, name, gps, typ, distance, schlagworte, requestid, pageid):
+    def __init__(self, name, gps, typ, distance, schlagworte, pageid):
         self.name = name
         self.gps = gps
         self.typ = typ
         self.schlagworte = schlagworte
-        self.requestid = requestid
         self.pageid = pageid
 
     def toDict(self):
@@ -22,19 +21,17 @@ class pushNotificationResponse():
             'gps': self.gps,
             'typ': self.typ,
             'schlagworte': self.schlagworte,
-            'requestid': self.requestid,
             'pageid': self.pageid
         }
         return dictionary
 
 class location():
-    def __init__(self, name, gps, typ, distance, schlagworte, requestid, pageid, imageurl, opening_hours, open_now):
+    def __init__(self, name, gps, type, distance, schlagworte, pageid, imageurl, opening_hours, open_now):
         self.name = name
         self.gps = gps
-        self.typ = typ
+        self.type = type
         self.distance = distance
         self.schlagworte = schlagworte
-        self.requestid = requestid
         self.pageid = pageid
         self.imageurl = imageurl
         self.opening_hours = opening_hours
@@ -44,9 +41,8 @@ class location():
         dictionary = {
             'name': self.name,
             'gps': self.gps,
-            'typ': self.typ,
+            'type': self.type,
             'schlagworte': self.schlagworte,
-            'requestid': self.requestid,
             'pageid': self.pageid,
             'imageurl': self.imageurl,
             'opening_hours': self.opening_hours,
@@ -54,9 +50,9 @@ class location():
         }
         return dictionary
 
-def getPlacesAtLocation(lattitude, longitude, radius, types):
-
-    r = requests.get('https://maps.googleapis.com/maps/api/place/radarsearch/json?location='+str(lattitude)+','+str(longitude)+'&radius='+str(radius)+'&types='+types+'&key=AIzaSyAd_yIgEyAddkiGQQapy-Cxo2BypNGdsNo').json()
+def getPlacesAtLocation(lattitude, longitude, radius, types, name):
+    types = "|".join(types)
+    r = requests.get('https://maps.googleapis.com/maps/api/place/radarsearch/json?location='+str(lattitude)+','+str(longitude)+'&radius='+str(radius)+'&types='+types+'&name='+name+'&key=AIzaSyAd_yIgEyAddkiGQQapy-Cxo2BypNGdsNo').json()
     try:
         placeID = r['results'][0]['place_id']
         r = requests.get('https://maps.googleapis.com/maps/api/place/details/json?placeid='+placeID+'&key=AIzaSyAd_yIgEyAddkiGQQapy-Cxo2BypNGdsNo').json()
@@ -122,49 +118,97 @@ def getSchlagworter(title, url):
             keywords.append(word['text'])
     return keywords[:5]
 
+
 @app.route('/get/locations/pushNotification/<latitude>/<longtitude>')
 def getPushLocations(latitude, longtitude):
     locations = []
-    for i in geosearch(latitude, longtitude, 'landmark',1000):
-        if len(locations)>5:
+    for article in geosearch(latitude, longtitude, 'landmark', 1000):
+        if len(locations) > 5:
             break
-        entry =pushNotificationResponse(i.get('title'),
-                                        {'lat':i.get('lat'),
-                                         'lon':i.get('lon')}, 
-                                         "typ", 
-                                         i.get('dist'), 
-                                         "test",
-                                         "stuff",
-                                         i.get('pageid'))
+        title = article.get('title')
+        latitude = article.get('lat')
+        longtitude = article.get('lon')
+        distance = article.get('dist')
+        page_ID = article.get('pageid')
+
+        # Google Places APi
+        allowedtypes = [
+            'museum',
+            'aquarium',
+            'art_gallery',
+            'book_store',
+            'cemetery',
+            'church'
+            'city_hall',
+            'hindu_temple',
+            'library',
+            'museum',
+            'place_of_worship',
+            'stadium',
+            'university',
+            'zoo']
+        googleResults = getPlacesAtLocation(latitude, longtitude, 1000, allowedtypes)
+        types = googleResults.get('types')
+
+        #Wiki Api
+        page = wikipedia.page(title, auto_suggest=True, redirect=False)
+
+        #Alchemy Api
+        keywords = getSchlagworter(page.title, page.url)
+
+        entry = pushNotificationResponse(title,
+                                         {'lat': latitude,
+                                          'lon': longtitude},
+                                         types,
+                                         distance,
+                                         keywords,
+                                         page_ID)
 
         locations.append(entry.toDict())
-    return jsonify({'notes':locations}), 200
+    return jsonify({'notes': locations}), 200
 
 
 @app.route('/get/locations/<latitude>/<longtitude>')
-def getLocations(latitude, longtitude):
+def getLocations(latitude, longtitude, **kwargs):
     locations = []
-    for i in geosearch(latitude, longtitude, 'landmark', 1000):
+    for article in geosearch(latitude, longtitude, 'landmark', 1000):
         if len(locations) > 5:
             break
-        page = wikipedia.page(i.get('title'), auto_suggest=True, redirect=False)
-        googleResults = getPlacesAtLocation(i.get('lat'), i.get('lon'), 1000, 'museum')
-        entry = location(i.get('title'),
-                         {'lat': i.get('lat'),
-                          'lon': i.get('lon')},
-                         googleResults.get('types'),
-                         i.get('dist'),
-                         getSchlagworter(page.title, page.url),
-                         "tet",
-                         i.get('pageid'),
-                         getImages(i.get('pageid')),
-                         googleResults.get('opening_times'),
-                         googleResults.get('opening_now'))
+        if not kwargs.get('radius'):
+            radius = 1000
+        title = article.get('title')
+        latitude = article.get('lat')
+        longtitude = article.get('lon')
+        distance = article.get('dist')
+        page_ID = article.get('pageid')
+
+        # Google Api
+        googleResults = getPlacesAtLocation(latitude, longtitude, radius, 'museum')
+        types = googleResults.get('types')
+        opening_hours = googleResults.get('opening_times'),
+        open_now = googleResults.get('opening_now')
+
+        # Wiki Api
+        images = getImages(page_ID)
+        page = wikipedia.page(title, auto_suggest=True, redirect=False)
+
+        # Alchemy Api
+        keywords = getSchlagworter(page.title, page.url)
+
+        entry = location(title,
+                         {'lat': latitude,
+                          'lon': longtitude},
+                         types,
+                         distance,
+                         keywords,
+                         page_ID,
+                         images,
+                         opening_hours,
+                         open_now
+                         )
 
         locations.append(entry.toDict())
-
-
-    return jsonify({'notes':locations})
+    return jsonify({'notes': locations})
 
 
 @app.route('/get/userID')
