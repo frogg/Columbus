@@ -9,14 +9,16 @@ import datetime
 from sqlalchemy.types import DateTime
 from sqlalchemy.ext.orderinglist import ordering_list
 
-
-
 Base = declarative_base()
- 
+
+
 class User(Base):
     __tablename__ = 'user'
     id = Column(Integer, primary_key=True)
-    lastLogin = Column(DateTime(timezone=True), primary_key=False, nullable=False, default=datetime.datetime.now())
+    lastLogin = Column(DateTime(timezone=True),
+                       primary_key=False,
+                       nullable=False,
+                       default=datetime.datetime.now())
 
 
 class Artikel(Base):
@@ -27,8 +29,8 @@ class Artikel(Base):
     longitude = Column(Float)
     gattung = Column(String(50))
     schlagworter = relationship('Schlagwort', backref='artikel',
-                            collection_class=ordering_list('position'),
-                            order_by='Schlagwort.position')
+                                collection_class=ordering_list('position'),
+                                order_by='Schlagwort.position')
     picUrl = Column(String(300))
     address = Column(Text)
     offnungszeiten = Column(Text)
@@ -55,8 +57,8 @@ class PersonalizedArtikel(Base):
     artikel_id = Column(Integer, ForeignKey('artikel.id'))
     user = relationship(User)
     artikel = relationship(Artikel)
-    liked = Column(Boolean, default = True)
-    counter = Column(Integer, default = 0)
+    liked = Column(Boolean, default=True)
+    counter = Column(Integer, default=0)
     #timespent = Zeit
 
 
