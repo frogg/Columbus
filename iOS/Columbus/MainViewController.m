@@ -13,7 +13,8 @@
 @end
 
 @implementation MainViewController
-
+@synthesize institutionOverView;
+int aktuell=0;
 - (void)viewDidLoad {
     [self.navigationController setNavigationBarHidden:YES animated:NO];
     [super viewDidLoad];
@@ -21,15 +22,64 @@
     self.view.backgroundColor=[UIColor whiteColor];
     
     
-    UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
-    [button addTarget:self action:@selector(deatils) forControlEvents:UIControlEventTouchUpInside];
-    [button setTitle:@"Details" forState:UIControlStateNormal];
-    button.backgroundColor=[UIColor greenColor];
-    button.frame=CGRectMake(100, 100, 100, 100);
-    [self.view addSubview:button];
+
     
+    
+    UIImageView *image = [[UIImageView alloc] initWithFrame:self.view.frame];
+    image.image=[UIImage imageNamed:@"loading_screen.png"];
+    image.contentMode=UIViewContentModeScaleAspectFill;
+    [self.view addSubview:image];
+    
+        [UIView animateWithDuration:0.5
+                              delay:2
+                            options: UIViewAnimationOptionCurveEaseOut
+                         animations:^
+         {
+             image.alpha=0;
+         }
+                         completion:^(BOOL finished)
+         {
+         }];
+
+    institutionOverView = [[InstitutionOverviewView alloc] initWithFrame:self.view.frame];
+    [self.view addSubview:institutionOverView];
+    institutionOverView.delegate=self;
+    
+    UIButton *menu = [UIButton buttonWithType:UIButtonTypeCustom];
+    [menu addTarget:self action:@selector(menu) forControlEvents:UIControlEventTouchUpInside];
+    [menu setImage:[UIImage imageNamed:@"menu_dark.png"] forState:UIControlStateNormal];
+    menu.frame=CGRectMake(0, 35-15, 24+15, 24+15);
+    [self.view addSubview:menu];
+    
+    UIButton *settings = [UIButton buttonWithType:UIButtonTypeCustom];
+    [settings addTarget:self action:@selector(settings) forControlEvents:UIControlEventTouchUpInside];
+    [settings setImage:[UIImage imageNamed:@"settings_dark.png"] forState:UIControlStateNormal];
+    settings.frame=CGRectMake(self.view.frame.size.width-24-30, 35-15, 24+30, 24+15);
+    [self.view addSubview:settings];
     
     // Do any additional setup after loading the view.
+}
+
+-(void) menu {
+    //KarteViewController *k = [[KarteViewController alloc] init];
+    //[self.navigationController pushViewController:k animated:YES];
+    
+    
+    MenuView *menu = [[MenuView alloc] initWithFrame:self.view.frame];
+    [self.view addSubview:menu];
+    menu.delegate=self;
+    [menu einblenden];
+}
+
+-(void) tips {
+    
+}
+
+-(void) karte {
+    KarteViewController *karte = [[KarteViewController alloc] init];
+    [self.navigationController pushViewController:karte animated:YES];
+    
+    
 }
 
 - (void)didReceiveMemoryWarning {
@@ -37,16 +87,54 @@
     // Dispose of any resources that can be recreated.
 }
 
--(void) deatils {
-    DetailViewController *suche = [[DetailViewController alloc] init];
+-(void) boring {
+    aktuell++;
+    [institutionOverView setInstitution:[AktuellsteListe aktuelleListe][aktuell]];
     
     
-    suche.modalTransitionStyle = UIModalTransitionStyleFlipHorizontal;
-    self.navigationController.modalPresentationStyle = UIModalPresentationCurrentContext;
     
-    [self.navigationController presentViewController:suche animated:YES completion: nil];
+    CATransition *animation = [CATransition animation];
+    animation.type = @"suckEffect";
+    animation.duration = 0.7f;
+    animation.timingFunction = UIViewAnimationCurveEaseInOut;
+    [institutionOverView.layer addAnimation:animation forKey:@"transitionViewAnimation"];
+    
 }
+
+-(void) details {
+    DetailViewController *detail = [[DetailViewController alloc] initWithInstitution:self.institution];
+    detail.modalTransitionStyle = UIModalTransitionStyleFlipHorizontal;
+    self.navigationController.modalPresentationStyle = UIModalPresentationCurrentContext;
+    [self.navigationController presentViewController:detail animated:YES completion: nil];
+}
+
+-(void) like {
+    aktuell++;
+    [institutionOverView setInstitution:[AktuellsteListe aktuelleListe][aktuell]];
     
+    CATransition *animation = [CATransition animation];
+    animation.type = @"rippleEffect";
+    animation.duration = 0.7f;
+    animation.timingFunction = UIViewAnimationCurveEaseInOut;
+    [institutionOverView.layer addAnimation:animation forKey:@"transitionViewAnimation"];
+}
+
+-(void) settings {
+    SettingsViewController *settings = [[SettingsViewController alloc] init];
+    [self.navigationController pushViewController:settings animated:YES];
+}
+
+-(void) newInstitution:(Institution *) institutionneu {
+    
+    self.institution=institutionneu;
+    [institutionOverView setInstitution:self.institution];
+
+}
+
+
+-(UIStatusBarStyle)preferredStatusBarStyle{
+    return UIStatusBarStyleDefault;
+}
 
 /*
 #pragma mark - Navigation

@@ -7,18 +7,22 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
 @import CoreLocation;
 
 @interface Institution : NSObject
 
 @property(readwrite) NSString *name;
+@property(readwrite) double distance;
 @property(readwrite) NSString *uuid;
 @property(readwrite) NSArray *keywords;
-@property(readwrite) NSArray *type;
+@property(readwrite) NSString *type;
 @property(readwrite) NSString *openingHours;
+@property(readwrite) UIImage *image;
+@property(readwrite) NSString *imageURL;
 @property(readwrite) CLLocationCoordinate2D location;
 
-
+-(void) imageUsingBlock:(void (^)(UIImage *image))block;
 
 
 @end

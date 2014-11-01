@@ -9,12 +9,15 @@
 #import <UIKit/UIKit.h>
 #import "MainViewController.h"
 #import "Institution.h"
+#import "MBFingerTipWindow.h"
+#import "AktuellsteListe.h"
 @import CoreLocation;
 
 @interface AppDelegate : UIResponder <UIApplicationDelegate,CLLocationManagerDelegate>
 
-@property (strong, nonatomic) UIWindow *window;
+@property (strong, nonatomic) MBFingerTipWindow *window;
 @property(nonatomic) CLLocationManager *locationManager;
+@property(nonatomic)MainViewController *firstView;
 
 @end
 

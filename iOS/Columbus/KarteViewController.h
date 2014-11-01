@@ -7,7 +7,12 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "Mapbox.h"
+#import "MenuView.h"
+#import "SettingsViewController.h"
+#import "MainViewController.h"
 
-@interface KarteViewController : UIViewController
+@interface KarteViewController : UIViewController <MenuDelegate>
+
 
 @end

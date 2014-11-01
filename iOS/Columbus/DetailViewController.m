@@ -14,29 +14,36 @@
 
 @implementation DetailViewController
 @synthesize institutionImage,webView;
+
+-(id) initWithInstitution:(Institution *) institution {
+    self=[super initWithNibName:nil bundle:nil];
+    
+    if(self) {
+        institutionImage = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, 200)];
+        void (^block)(UIImage *) = ^(UIImage *image) {
+            [self performSelectorInBackground:@selector(blurImageInBackground:) withObject:image];
+        };
+        
+        [institution imageUsingBlock:block];
+        
+        [self.view addSubview:institutionImage];
+        
+        webView = [[UIWebView alloc] initWithFrame:CGRectMake(0, 200, self.view.frame.size.width, self.view.frame.size.height-200)];
+        [self.view addSubview:webView];
+        [webView loadHTMLString:@"TEST<br><b>Test</b>" baseURL:nil];
+        
+        
+        UIButton *back = [UIButton buttonWithType:UIButtonTypeCustom];
+        [back addTarget:self action:@selector(back) forControlEvents:UIControlEventTouchUpInside];
+        [back setImage:[UIImage imageNamed:@"back_light.png"] forState:UIControlStateNormal];
+        back.frame=CGRectMake(15, 35, 24, 24);
+        [self.view addSubview:back];
+    }
+    return self;
+}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.view.backgroundColor=[UIColor blueColor];
-    
-    
-    institutionImage = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, 200)];
-    [self performSelectorInBackground:@selector(blurImageInBackground:) withObject:[UIImage imageNamed:@"default.png"]];
-    [self.view addSubview:institutionImage];
-    
-    
-    
-    UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
-    [button addTarget:self action:@selector(back) forControlEvents:UIControlEventTouchUpInside];
-    [button setTitle:@"Zurück" forState:UIControlStateNormal];
-    button.backgroundColor=[UIColor greenColor];
-    button.frame=CGRectMake(100, 100, 100, 100);
-    [self.view addSubview:button];
-    
-    
-    webView = [[UIWebView alloc] initWithFrame:CGRectMake(0, 200, self.view.frame.size.width, self.view.frame.size.height-200)];
-    [self.view addSubview:webView];
-    [webView loadHTMLString:@"TEST<br><b>Test</b>" baseURL:nil];
-    
     // Do any additional setup after loading the view.
 }
 
@@ -50,7 +57,7 @@
 }
 
 -(void) blurImageInBackground:(UIImage *) image {
-    image = [image applyBlurWithRadius:10 tintColor:[UIColor colorWithRed:0 green:0 blue:0 alpha:0.0] saturationDeltaFactor:0.0 maskImage:nil];
+    image = [image applyBlurWithRadius:2 tintColor:[UIColor colorWithRed:0 green:0 blue:0 alpha:0.0] saturationDeltaFactor:1.0 maskImage:nil];
     [institutionImage performSelectorOnMainThread:@selector(setImage:) withObject:image waitUntilDone:NO];
 }
 
