@@ -1,12 +1,12 @@
 import wikipedia
 import json
 import requests
+from flask import Flask, jsonify, request
 import sql
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy_declarative import *
 
-from flask import Flask, jsonify
 app = Flask(__name__)
 @app.route('/')
 def hi():
@@ -55,15 +55,18 @@ class location():
         }
         return dictionary
 
-def getPlacesAtLocation(lattitude, longitude, radius, types, name):
+def getPlacesAtLocation(lattitude, longitude, radius, types):
     types = "|".join(types)
-    r = requests.get('https://maps.googleapis.com/maps/api/place/radarsearch/json?location='+str(lattitude)+','+str(longitude)+'&radius='+str(radius)+'&types='+types+'&name='+name+'&key=AIzaSyAd_yIgEyAddkiGQQapy-Cxo2BypNGdsNo').json()
+    r = requests.get('https://maps.googleapis.com/maps/api/place/radarsearch/json?location='+str(lattitude)+','+str(longitude)+'&radius='+str(radius)+'&types='+types+'&key=AIzaSyAd_yIgEyAddkiGQQapy-Cxo2BypNGdsNo').json()
     try:
         placeID = r['results'][0]['place_id']
         r = requests.get('https://maps.googleapis.com/maps/api/place/details/json?placeid='+placeID+'&key=AIzaSyAd_yIgEyAddkiGQQapy-Cxo2BypNGdsNo').json()
         result = {}
-        result['types'] = r['result']['types']
-        if r['result']['opening_hours']:
+        try:
+            result['types'] = r['result']['types']
+        except KeyError:
+            result['types'] = None
+        try:
             if r['result']['opening_hours']['open_now']:
                 result['open_now'] = r['result']['opening_hours']['open_now']
             else:
@@ -76,13 +79,14 @@ def getPlacesAtLocation(lattitude, longitude, radius, types, name):
                                        'fri': [1000, None, None, 1700],
                                        'sat': [1000, None, None, 1700],
                                        'sun': [1000, None, None, 1700]}
-
-        else:
+        except KeyError:
             result['open_now'] = None
             result['opening_times'] = None
         return result
     except IndexError:
-        return None
+        result['types'] = None
+        result['open_now'] = None
+        result['opening_times'] = None
 
 
 def geosearch(latitude, longtitude, gtype,radius): 
@@ -127,9 +131,12 @@ def getSchlagworter(title, url):
 @app.route('/get/locations/pushNotification/<latitude>/<longtitude>')
 def getPushLocations(latitude, longtitude):
     locations = []
-    for article in geosearch(latitude, longtitude, 'landmark', 1000):
+    radius = request.args.get('radius', 1000)
+    userID = request.args.get('userID')
+    for article in geosearch(latitude, longtitude, 'landmark', radius):
         if len(locations) > 5:
             break
+        print(request.args)
         title = article.get('title')
         latitude = article.get('lat')
         longtitude = article.get('lon')
@@ -152,7 +159,7 @@ def getPushLocations(latitude, longtitude):
             'stadium',
             'university',
             'zoo']
-        googleResults = getPlacesAtLocation(latitude, longtitude, 1000, allowedtypes)
+        googleResults = getPlacesAtLocation(latitude, longtitude, radius, allowedtypes)
         types = googleResults.get('types')
 
         #Wiki Api
@@ -176,11 +183,11 @@ def getPushLocations(latitude, longtitude):
 @app.route('/get/locations/<latitude>/<longtitude>')
 def getLocations(latitude, longtitude, **kwargs):
     locations = []
-    for article in geosearch(latitude, longtitude, 'landmark', 1000):
+    radius = request.args.get('radius', 1000)
+    userID = request.args.get('userID')
+    for article in geosearch(latitude, longtitude, 'landmark', radius):
         if len(locations) > 5:
             break
-        if not kwargs.get('radius'):
-            radius = 1000
         title = article.get('title')
         latitude = article.get('lat')
         longtitude = article.get('lon')
@@ -191,7 +198,22 @@ def getLocations(latitude, longtitude, **kwargs):
         
 
         # Google Api
-        googleResults = getPlacesAtLocation(latitude, longtitude, radius, 'museum')
+        allowedtypes = [
+            'museum',
+            'aquarium',
+            'art_gallery',
+            'book_store',
+            'cemetery',
+            'church'
+            'city_hall',
+            'hindu_temple',
+            'library',
+            'museum',
+            'place_of_worship',
+            'stadium',
+            'university',
+            'zoo']
+        googleResults = getPlacesAtLocation(latitude, longtitude, radius, allowedtypes)
         types = googleResults.get('types')
         opening_hours = googleResults.get('opening_times'),
         open_now = googleResults.get('opening_now')
@@ -218,7 +240,10 @@ def getLocations(latitude, longtitude, **kwargs):
 
         locations.append(entry.toDict())
     return jsonify({'notes': locations})
-
+@app.route('/get/details/<pageid>')
+def getDetails(pageid):
+    
+    return "Not read yet"
 
 @app.route('/get/userID/')
 def getUserID():
