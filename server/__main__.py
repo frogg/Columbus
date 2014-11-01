@@ -81,7 +81,9 @@ def getPlacesAtLocation(lattitude, longitude, radius, types):
             result['opening_times'] = None
         return result
     except IndexError:
-        return None
+        result['types'] = None
+        result['open_now'] = None
+        result['opening_times'] = None
 
 
 def geosearch(latitude, longtitude, gtype,radius): 
