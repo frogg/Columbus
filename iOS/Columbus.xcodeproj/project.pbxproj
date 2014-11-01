@@ -13,7 +13,13 @@
 		51C053481A03FC8000A1C15C /* ColumbusTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 51C053471A03FC8000A1C15C /* ColumbusTests.m */; };
 		51C053551A03FCAD00A1C15C /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 51C053521A03FCAD00A1C15C /* AppDelegate.m */; };
 		51C053561A03FCAD00A1C15C /* MainViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 51C053541A03FCAD00A1C15C /* MainViewController.m */; };
-		51CF87261A041ABA001E612E /* Echterdingen.gpx in Resources */ = {isa = PBXBuildFile; fileRef = 51CF87251A041ABA001E612E /* Echterdingen.gpx */; };
+		51CF87261A041ABA001E612E /* Spielkartenmuseum Leinfelden.gpx in Resources */ = {isa = PBXBuildFile; fileRef = 51CF87251A041ABA001E612E /* Spielkartenmuseum Leinfelden.gpx */; };
+		51CF87291A042B05001E612E /* KarteViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 51CF87281A042B05001E612E /* KarteViewController.m */; };
+		51CF872C1A042B0F001E612E /* ListeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 51CF872B1A042B0F001E612E /* ListeViewController.m */; };
+		51CF872F1A043352001E612E /* DetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 51CF872E1A043352001E612E /* DetailViewController.m */; };
+		51CF87321A044342001E612E /* Institution.m in Sources */ = {isa = PBXBuildFile; fileRef = 51CF87311A044342001E612E /* Institution.m */; };
+		51CF87351A044DA5001E612E /* UIImage+ImageEffects.m in Sources */ = {isa = PBXBuildFile; fileRef = 51CF87341A044DA5001E612E /* UIImage+ImageEffects.m */; };
+		51CF87371A044ECD001E612E /* default.png in Resources */ = {isa = PBXBuildFile; fileRef = 51CF87361A044ECD001E612E /* default.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -39,7 +45,18 @@
 		51C053521A03FCAD00A1C15C /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		51C053531A03FCAD00A1C15C /* MainViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MainViewController.h; sourceTree = "<group>"; };
 		51C053541A03FCAD00A1C15C /* MainViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MainViewController.m; sourceTree = "<group>"; };
-		51CF87251A041ABA001E612E /* Echterdingen.gpx */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = Echterdingen.gpx; sourceTree = "<group>"; };
+		51CF87251A041ABA001E612E /* Spielkartenmuseum Leinfelden.gpx */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = "Spielkartenmuseum Leinfelden.gpx"; sourceTree = "<group>"; };
+		51CF87271A042B05001E612E /* KarteViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KarteViewController.h; sourceTree = "<group>"; };
+		51CF87281A042B05001E612E /* KarteViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KarteViewController.m; sourceTree = "<group>"; };
+		51CF872A1A042B0F001E612E /* ListeViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ListeViewController.h; sourceTree = "<group>"; };
+		51CF872B1A042B0F001E612E /* ListeViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ListeViewController.m; sourceTree = "<group>"; };
+		51CF872D1A043352001E612E /* DetailViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DetailViewController.h; sourceTree = "<group>"; };
+		51CF872E1A043352001E612E /* DetailViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DetailViewController.m; sourceTree = "<group>"; };
+		51CF87301A044342001E612E /* Institution.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Institution.h; sourceTree = "<group>"; };
+		51CF87311A044342001E612E /* Institution.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Institution.m; sourceTree = "<group>"; };
+		51CF87331A044DA5001E612E /* UIImage+ImageEffects.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+ImageEffects.h"; sourceTree = "<group>"; };
+		51CF87341A044DA5001E612E /* UIImage+ImageEffects.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+ImageEffects.m"; sourceTree = "<group>"; };
+		51CF87361A044ECD001E612E /* default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = default.png; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -63,7 +80,8 @@
 		51C0531F1A03FC8000A1C15C = {
 			isa = PBXGroup;
 			children = (
-				51CF87251A041ABA001E612E /* Echterdingen.gpx */,
+				51CF87361A044ECD001E612E /* default.png */,
+				51CF87251A041ABA001E612E /* Spielkartenmuseum Leinfelden.gpx */,
 				51C0532A1A03FC8000A1C15C /* Columbus */,
 				51C053441A03FC8000A1C15C /* ColumbusTests */,
 				51C053291A03FC8000A1C15C /* Products */,
@@ -86,6 +104,16 @@
 				51C053521A03FCAD00A1C15C /* AppDelegate.m */,
 				51C053531A03FCAD00A1C15C /* MainViewController.h */,
 				51C053541A03FCAD00A1C15C /* MainViewController.m */,
+				51CF872D1A043352001E612E /* DetailViewController.h */,
+				51CF872E1A043352001E612E /* DetailViewController.m */,
+				51CF87271A042B05001E612E /* KarteViewController.h */,
+				51CF87281A042B05001E612E /* KarteViewController.m */,
+				51CF872A1A042B0F001E612E /* ListeViewController.h */,
+				51CF872B1A042B0F001E612E /* ListeViewController.m */,
+				51CF87301A044342001E612E /* Institution.h */,
+				51CF87311A044342001E612E /* Institution.m */,
+				51CF87331A044DA5001E612E /* UIImage+ImageEffects.h */,
+				51CF87341A044DA5001E612E /* UIImage+ImageEffects.m */,
 				51C053381A03FC8000A1C15C /* Images.xcassets */,
 				51C0533A1A03FC8000A1C15C /* LaunchScreen.xib */,
 				51C0532B1A03FC8000A1C15C /* Supporting Files */,
@@ -204,9 +232,10 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				51CF87261A041ABA001E612E /* Echterdingen.gpx in Resources */,
+				51CF87261A041ABA001E612E /* Spielkartenmuseum Leinfelden.gpx in Resources */,
 				51C0533C1A03FC8000A1C15C /* LaunchScreen.xib in Resources */,
 				51C053391A03FC8000A1C15C /* Images.xcassets in Resources */,
+				51CF87371A044ECD001E612E /* default.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -224,9 +253,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				51CF87351A044DA5001E612E /* UIImage+ImageEffects.m in Sources */,
 				51C053551A03FCAD00A1C15C /* AppDelegate.m in Sources */,
 				51C053561A03FCAD00A1C15C /* MainViewController.m in Sources */,
+				51CF87291A042B05001E612E /* KarteViewController.m in Sources */,
+				51CF872C1A042B0F001E612E /* ListeViewController.m in Sources */,
+				51CF87321A044342001E612E /* Institution.m in Sources */,
 				51C0532E1A03FC8000A1C15C /* main.m in Sources */,
+				51CF872F1A043352001E612E /* DetailViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

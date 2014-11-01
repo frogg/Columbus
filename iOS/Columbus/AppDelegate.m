@@ -19,7 +19,13 @@
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     [self.window makeKeyAndVisible];
     
-
+    locationManager = [[CLLocationManager alloc] init];
+    locationManager.distanceFilter = 40;
+    locationManager.desiredAccuracy = kCLLocationAccuracyBest;
+    [locationManager requestAlwaysAuthorization];
+    locationManager.delegate = self;
+    locationManager.pausesLocationUpdatesAutomatically=NO;
+    
     
     UIMutableUserNotificationAction *notificationAction2 = [[UIMutableUserNotificationAction alloc] init];
     notificationAction2.identifier = @"Reject";
@@ -33,7 +39,7 @@
     UIMutableUserNotificationCategory *notificationCategory = [[UIMutableUserNotificationCategory alloc] init];
     notificationCategory.identifier = @"Boring";
     [notificationCategory setActions:@[notificationAction2] forContext:UIUserNotificationActionContextDefault];
-
+    
     
     NSSet *categories = [NSSet setWithObjects:notificationCategory, nil];
     
@@ -43,13 +49,9 @@
     [[UIApplication sharedApplication] registerUserNotificationSettings:notificationSettings];
     
     
-    locationManager = [[CLLocationManager alloc] init];
-    locationManager.distanceFilter = 40;
-    locationManager.desiredAccuracy = kCLLocationAccuracyBest;
-    [locationManager requestAlwaysAuthorization];
     
-    NSLog(@"%f",locationManager.location.coordinate.longitude);
-    locationManager.delegate = self;
+    
+    
     
     MainViewController *firstView = [[MainViewController alloc] init];
     
@@ -70,16 +72,20 @@
 - (void)applicationDidEnterBackground:(UIApplication *)application
 {
     NSLog(@"background started");
-    [locationManager requestAlwaysAuthorization];
+    [locationManager stopUpdatingLocation];
     [locationManager startUpdatingLocation];
 }
 
 //starts automatically with locationManager
 -(void)locationManager:(CLLocationManager *)manager didUpdateToLocation:(CLLocation *)newLocation fromLocation:(CLLocation *)oldLocation{
-    NSLog(@"Location: %f, %f", newLocation.coordinate.longitude, newLocation.coordinate.latitude);
+    //    NSLog(@"Location: %f, %f", newLocation.coordinate.longitude, newLocation.coordinate.latitude);
     
-    NSMutableURLRequest *request =[NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"https://api.sendgrid.com/api/mail.send.json"]];
-    [request setHTTPMethod:@"POST"];
+    
+    NSLog(@"Starting Background Server Loading Request…");
+//    NSMutableURLRequest *request =[NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://192.168.1.50:5000/get/locations/pushNotification/%f/%f",newLocation.coordinate.latitude,newLocation.coordinate.longitude]]];
+        NSMutableURLRequest *request =[NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://google.de/%f/%f",newLocation.coordinate.latitude,newLocation.coordinate.longitude]]];
+    
+    [request setHTTPMethod:@"GET"];
     
     NSString *post = nil;
     NSData *postData = [post dataUsingEncoding:NSASCIIStringEncoding allowLossyConversion:YES];
@@ -89,14 +95,50 @@
     NSError *err;
     NSData *responseData = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&err];
     
-    NSString *result =[[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding];
+    //    NSString *result =[[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding];
     
-    
-    UILocalNotification *notification = [[UILocalNotification alloc] init];
-    notification.fireDate = [NSDate date];
-    notification.alertBody = result;
-    notification.category=@"Boring";
-    [[UIApplication sharedApplication] scheduleLocalNotification:notification];
+    if(responseData) {
+        NSDictionary *dic = [NSJSONSerialization JSONObjectWithData:responseData options:0 error:nil];
+        
+        
+        NSArray *institutionen = [dic objectForKey:@"notes"];
+        
+        NSMutableArray *institutions = [[NSMutableArray alloc] init];
+        if(institutionen && [institutionen count]>0) {
+            for(NSDictionary *institutionDic in institutionen) {
+                Institution *institution = [[Institution alloc] init];
+                double lat = [[[institutionDic objectForKey:@"gps"] objectForKey:@"lat"] doubleValue];
+                double lon = [[[institutionDic objectForKey:@"gps"] objectForKey:@"lon"] doubleValue];
+                
+                
+                
+                institution.name=[institutionDic objectForKey:@"name"];
+                institution.type=[institutionDic objectForKey:@"typ"];
+                institution.location=CLLocationCoordinate2DMake(lat, lon);
+                
+                [institutions addObject:institution];
+                
+            }
+            
+            if([institutions count]>0) {
+                Institution *pushInstitution = [institutions objectAtIndex:0];
+                
+                UILocalNotification *notification = [[UILocalNotification alloc] init];
+                notification.fireDate = [NSDate date];
+                notification.alertBody = [NSString stringWithFormat:@"%@ | %@",pushInstitution.name,pushInstitution.type];
+                notification.category=@"Boring";
+                notification.soundName=@"";
+                [[UIApplication sharedApplication] scheduleLocalNotification:notification];
+                NSLog(@"Push Notification Sent");
+            } else {
+                NSLog(@"keine geeigneten Museen in der Nähe gefunden");
+            }
+        } else {
+            NSLog(@"keine geeigneten Museen in der Nähe gefunden");
+        }
+    } else {
+        NSLog(@"Server nicht verfügbar.");
+    }
 }
 
 //starts when application switches back from background
@@ -113,6 +155,10 @@
     // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
 }
 
+
+-(void)locationManager:(CLLocationManager *)manager didFailWithError:(NSError *)error {
+    NSLog(@"%@",error.description);
+}
 
 
 

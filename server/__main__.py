@@ -63,14 +63,23 @@ def apicall(language, action, response_format, listParams, specialValues):
     r = r.json().get('query').get('geosearch')
     return r
 
-def getSchlagworter(content):
-    r = requests.get('https://api.idolondemand.com/1/api/sync/extractconcepts/v1?text={0}&apikey=f0438796-6744-4ca2-9923-34605b45b713'.format(content))
+def getSchlagworter(title, url):
+    test = "http://en.wikipedia.org/wiki/Mercedes-Benz";
+    r = requests.get('http://access.alchemyapi.com/calls/url/URLGetRankedKeywords?apikey=42918a4b1646af1e6e18c3048afced054c452dd4&url={0}&outputMode=json&maxRetrieve=10'.format(test))
     if not r.status_code == requests.codes.ok:
         return []
     z = r.json()
+    z = 0
     keywords= []
-    for word in z['concepts'][:5]:
-        keywords.append(word['concept'])
+    for word in z['keywords']:
+        if z < 5:
+            if title in word['text']:
+                print("It's there!!!")
+                z+= 1
+            else:
+                keywords.append(word['text'])
+        else:
+            keywords.append(word['text'])
     return keywords
 
 @app.route('/get/locations/pushNotification/<latitude>/<longtitude>')
@@ -109,6 +118,7 @@ def getLocations(latitude, longtitude):
                          'oeffnungszeiten')
 
         locations.append(entry.toDict())
+<<<<<<< HEAD
 
     return jsonify({'notes':locations})
 '''
@@ -116,7 +126,18 @@ def getLocations(latitude, longtitude):
 def pushLocations(latitude, longtitude):
     return wikipedia.geosearch(latitude, longtitude)
     return 'Hello World!'
+=======
+    for location in locations:
+        getSite(location.pageid)
+    return "sutff"
+>>>>>>> 8fac7da4311521b98dc39c8b03900105e171f683
 
+
+@app.route('/get/userID')
+def getUserID():
+    return "QUAPPI RULES"
+    
+'''
 @app.route('/get/Info/<latitude>/<longtitude>')
 def pushLocations(latitude, longtitude):
     return wikipedia.geosearch(latitude, longtitude)

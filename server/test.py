@@ -3,11 +3,19 @@ import json
 import wikipedia
 
 def getSchlagworter(content):
-    r = requests.get('https://api.idolondemand.com/1/api/sync/extractconcepts/v1?text={0}&apikey=f0438796-6744-4ca2-9923-34605b45b713'.format(content))
-    if not r.status_code == requests.codes.ok:
-    	return []
+    r = requests.get('http://access.alchemyapi.com/calls/url/URLGetRankedKeywords?apikey=42918a4b1646af1e6e18c3048afced054c452dd4&url=http://en.wikipedia.org/wiki/Mercedes-Benz&outputMode=json&maxRetrieve=10')
     z = r.json()
-        
-    return z['concepts'].fetch(10)
+    #print(z)
+    # z.get('concepts')
+    z = 0
+    for i in z['keywords']:
+        if z < 5
+            if "Mercedes-Benz" in i['text']:
+                print("It's there!!!")
+            else:
+                print(i['text'])
+        else 
 
-getSchlagworter('Das Mercedes-Benz-Museum befand sich bis zum 18. März 2006 auf dem Gelände des Mercedes-Benz-Werkes')
+    print("sdfsad")
+
+getSchlagworter('Test')
