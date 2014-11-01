@@ -17,7 +17,7 @@ class pushNotificationResponse():
         self.pageid = pageid
 
     def toDict(self):
-        json = {
+        dictionary = {
             'name': self.name,
             'gps': self.gps,
             'typ': self.typ,
@@ -25,10 +25,34 @@ class pushNotificationResponse():
             'requestid': self.requestid,
             'pageid': self.pageid
         }
-        return json
+        return dictionary
 
-def geosearch(latitude, longtitude, gtype,radius):
-    return apicall('de','query','json','geosearch',"&type={0}&gsradius={3}&gscoord={1}|{2}".format(gtype, latitude,longtitude,radius))
+class location():
+    def __init__(self, name, gps, typ, distance, schlagworte, requestid, pageid, imageurl,oeffnungszeiten):
+        self.name = name
+        self.gps = gps
+        self.typ = typ
+        self.distance = distance
+        self.schlagworte = schlagworte
+        self.requestid = requestid
+        self.pageid = pageid
+        self.imageurl = imageurl
+        self.oeffnungszeiten = oeffnungszeiten
+    def toDict(self):
+        dictionary = {
+            'name': self.name,
+            'gps': self.gps,
+            'typ': self.typ,
+            'schlagworte': self.schlagworte,
+            'requestid': self.requestid,
+            'pageid': self.pageid,
+            'imageurl': self.imageurl,
+            'oeffnungszeiten': self.oeffnungszeiten
+        }
+        return dictionary
+
+def geosearch(latitude, longtitude, gtype,radius): 
+    return apicall('en','query','json','geosearch',"&type={0}&gsradius={3}&gscoord={1}|{2}".format(gtype, latitude,longtitude,radius))
 
 def getSite(siteID):
 
@@ -68,24 +92,25 @@ def getPushLocations(latitude, longtitude):
     return jsonify({'notes':locations}), 200
 
 @app.route('/get/locations/<latitude>/<longtitude>')
-def pushLocations(latitude, longtitude):
+def getLocations(latitude, longtitude):
     locations = []
     for i in geosearch(latitude, longtitude, 'landmark', 1000):
         if len(locations)>5:
             break
-        entry =pushNotificationResponse(i.get('title'),
-                                        {'lat':i.get('lat'),
-                                         'long':i.get('long')}, 
-                                         "typ", 
-                                         i.get('dist'), 
-                                         getSchlagworter(wikipedia.summary(i.get('title'))),
-                                         "stuff",
-                                         i.get('pageid'))
+        entry = location(i.get('title'),
+                         {'lat': i.get('lat'),
+                          'long': i.get('long')},
+                         "typ",
+                         i.get('dist'),
+                         "test",
+                         getSchlagworter(wikipedia.summary(i.get('title'))),
+                         i.get('pageid'),
+                         "http://upload.wikimedia.org/wikipedia/commons/1/1a/Mercedes-Benz_Museum_201312_02_sunset.jpg",
+                         'oeffnungszeiten')
 
         locations.append(entry.toDict())
-    for location in locations:
-        getSite(location.pageid)
-    return "sutff"
+
+    return jsonify({'notes':locations})
 '''
 @app.route('/get/userID')
 def pushLocations(latitude, longtitude):
@@ -100,5 +125,6 @@ def pushLocations(latitude, longtitude):
 @app.errorhandler(404)
 def page_not_found(error):
     return "Page not found", 404
+
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')
