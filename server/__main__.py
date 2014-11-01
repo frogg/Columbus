@@ -13,24 +13,26 @@ def hi():
     return "hey"
 
 class pushNotificationResponse():
-    def __init__(self, name, gps, typ, distance, schlagworte, pageid):
+    def __init__(self, name, gps, typ, distance, image, schlagworte, pageid):
         self.name = name
         self.gps = gps
         self.typ = typ
         self.schlagworte = schlagworte
+        self.image = image
         self.pageid = pageid
 
     def toDict(self):
         dictionary = {
             'name': self.name,
             'gps': self.gps,
-            'typ': self.typ,
+            'type': self.typ,
+            'imageurl': self.image,
             'schlagworte': self.schlagworte,
             'pageid': self.pageid
         }
         return dictionary
 
-class location():
+class Wikipedia_Entry():
     def __init__(self, name, gps, type, distance, schlagworte, pageid, imageurl, opening_hours, open_now):
         self.name = name
         self.gps = gps
@@ -93,18 +95,19 @@ def geosearch(latitude, longtitude, gtype,radius):
     return apicall('en', 'query', 'json', "&type={0}&gsradius={3}&gscoord={1}|{2}&list=geosearch".format(gtype, latitude,longtitude,radius)).get('query').get('geosearch')
 
 
-def getImages(pageid):
-    images = []
+def getImage(page_IDs):
+    page_IDs = "|".join(page_IDs)
+    response= apicall('en', 'query', 'json', "&prop=pageimages&inprop=url&pageids={0}&pithumbsize=600".format(page_IDs)).get('query')
 
-    response= apicall('commons', 'query', 'json', "&pageids={0}&prop=imageinfo&iiprop=url".format(pageid)).get('query')
     for page in response.get('pages'):
-        for image in response.get('pages').get(page).get('imageinfo'):
-            images.append(image.get('url'))
-    return images
+        image = response.get('pages').get(page).get('thumbnail').get('source')
+    return image
 
 
 def apicall(language, action, response_format, specialValues):
-    r = requests.get("https://{0}.wikipedia.org/w/api.php?action={1}&format={2}{3}".format(language,action,response_format,specialValues))
+    url = "https://{0}.wikipedia.org/w/api.php?action={1}&format={2}{3}".format(language,action,response_format,specialValues)
+    print(url)
+    r = requests.get(url)
     r = r.json()
     return r
 
@@ -128,13 +131,13 @@ def getSchlagworter(title, url):
     return keywords[:5]
 
 
-@app.route('/get/locations/pushNotification/<latitude>/<longtitude>')
+@app.route('/get/articles/pushNotification/<latitude>/<longtitude>')
 def getPushLocations(latitude, longtitude):
-    locations = []
+    articles = []
     radius = request.args.get('radius', 1000)
     userID = request.args.get('userID')
     for article in geosearch(latitude, longtitude, 'landmark', radius):
-        if len(locations) > 5:
+        if len(articles) > 5:
             break
         print(request.args)
         title = article.get('title')
@@ -143,6 +146,8 @@ def getPushLocations(latitude, longtitude):
         distance = article.get('dist')
         page_ID = article.get('pageid')
 
+
+        image = getImage([str(page_ID)])
         # Google Places APi
         allowedtypes = [
             'museum',
@@ -173,20 +178,21 @@ def getPushLocations(latitude, longtitude):
                                           'lon': longtitude},
                                          types,
                                          distance,
+                                         image,
                                          keywords,
                                          page_ID)
 
-        locations.append(entry.toDict())
-    return jsonify({'notes': locations}), 200
+        articles.append(entry.toDict())
+    return jsonify({'notes': articles}), 200
 
 
-@app.route('/get/locations/<latitude>/<longtitude>')
+@app.route('/get/articles/<latitude>/<longtitude>')
 def getLocations(latitude, longtitude, **kwargs):
-    locations = []
+    articles = []
     radius = request.args.get('radius', 1000)
     userID = request.args.get('userID')
     for article in geosearch(latitude, longtitude, 'landmark', radius):
-        if len(locations) > 5:
+        if len(articles) > 5:
             break
         title = article.get('title')
         latitude = article.get('lat')
@@ -219,27 +225,27 @@ def getLocations(latitude, longtitude, **kwargs):
         open_now = googleResults.get('opening_now')
 
         # Wiki Api
-        images = getImages(page_ID)
+        image = getImage([str(page_ID)])
         page = wikipedia.page(title, auto_suggest=True, redirect=False)
 
         # Alchemy Api
         keywords = getSchlagworter(page.title, page.url)
 
 
-        entry = location(title,
-                         {'lat': latitude,
-                          'lon': longtitude},
-                         types,
-                         distance,
-                         keywords,
-                         page_ID,
-                         images,
-                         opening_hours,
-                         open_now
-                         )
+        entry = Wikipedia_Entry(title,
+                        {'lat': latitude,
+                         'lon': longtitude},
+                        types,
+                        distance,
+                        keywords,
+                        page_ID,
+                        image,
+                        opening_hours,
+                        open_now
+                        )
 
-        locations.append(entry.toDict())
-    return jsonify({'notes': locations})
+        articles.append(entry.toDict())
+    return jsonify({'notes': articles})
 @app.route('/get/details/<pageid>')
 def getDetails(pageid):
     
