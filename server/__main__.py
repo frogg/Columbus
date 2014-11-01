@@ -59,8 +59,11 @@ def getPlacesAtLocation(lattitude, longitude, radius, types):
         placeID = r['results'][0]['place_id']
         r = requests.get('https://maps.googleapis.com/maps/api/place/details/json?placeid='+placeID+'&key=AIzaSyAd_yIgEyAddkiGQQapy-Cxo2BypNGdsNo').json()
         result = {}
-        result['types'] = r['result']['types']
-        if r['result']['opening_hours']:
+        try:
+            result['types'] = r['result']['types']
+        except KeyError:
+            result['types'] = None
+        try:
             if r['result']['opening_hours']['open_now']:
                 result['open_now'] = r['result']['opening_hours']['open_now']
             else:
@@ -73,8 +76,7 @@ def getPlacesAtLocation(lattitude, longitude, radius, types):
                                        'fri': [1000, None, None, 1700],
                                        'sat': [1000, None, None, 1700],
                                        'sun': [1000, None, None, 1700]}
-
-        else:
+        except KeyError:
             result['open_now'] = None
             result['opening_times'] = None
         return result
@@ -124,7 +126,9 @@ def getSchlagworter(title, url):
 @app.route('/get/locations/pushNotification/<latitude>/<longtitude>')
 def getPushLocations(latitude, longtitude):
     locations = []
-    for article in geosearch(latitude, longtitude, 'landmark', 1000):
+    radius = request.args.get('radius', 1000)
+    userID = request.args.get('userID')
+    for article in geosearch(latitude, longtitude, 'landmark', radius):
         if len(locations) > 5:
             break
         print(request.args)
@@ -150,7 +154,7 @@ def getPushLocations(latitude, longtitude):
             'stadium',
             'university',
             'zoo']
-        googleResults = getPlacesAtLocation(latitude, longtitude, 1000, allowedtypes)
+        googleResults = getPlacesAtLocation(latitude, longtitude, radius, allowedtypes)
         types = googleResults.get('types')
 
         #Wiki Api
@@ -174,11 +178,11 @@ def getPushLocations(latitude, longtitude):
 @app.route('/get/locations/<latitude>/<longtitude>')
 def getLocations(latitude, longtitude, **kwargs):
     locations = []
-    for article in geosearch(latitude, longtitude, 'landmark', 1000):
+    radius = request.args.get('radius', 1000)
+    userID = request.args.get('userID')
+    for article in geosearch(latitude, longtitude, 'landmark', radius):
         if len(locations) > 5:
             break
-        print(kwargs)
-        radius= 1000
         title = article.get('title')
         latitude = article.get('lat')
         longtitude = article.get('lon')
@@ -227,7 +231,10 @@ def getLocations(latitude, longtitude, **kwargs):
 
         locations.append(entry.toDict())
     return jsonify({'notes': locations})
-
+@app.route('/get/details/<pageid>')
+def getDetails(pageid):
+    
+    return "Not read yet"
 
 @app.route('/get/userID')
 def getUserID():
