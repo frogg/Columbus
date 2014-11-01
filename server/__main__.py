@@ -2,6 +2,9 @@ import wikipedia
 import json
 import requests
 import sql
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy_declarative import *
 
 from flask import Flask, jsonify
 app = Flask(__name__)
@@ -184,6 +187,9 @@ def getLocations(latitude, longtitude, **kwargs):
         distance = article.get('dist')
         page_ID = article.get('pageid')
 
+        #check if artikel has been loaded already
+        
+
         # Google Api
         googleResults = getPlacesAtLocation(latitude, longtitude, radius, 'museum')
         types = googleResults.get('types')
@@ -196,6 +202,7 @@ def getLocations(latitude, longtitude, **kwargs):
 
         # Alchemy Api
         keywords = getSchlagworter(page.title, page.url)
+
 
         entry = location(title,
                          {'lat': latitude,
@@ -213,9 +220,12 @@ def getLocations(latitude, longtitude, **kwargs):
     return jsonify({'notes': locations})
 
 
-@app.route('/get/userID')
+@app.route('/get/userID/')
 def getUserID():
-    return "QUAPPI RUL€ZZZ"
+    new_user = User(lastLogin = datetime.datetime.now())
+    session.add(new_user)
+    session.commit()
+    return jsonify({'userID':new_user.id})
     
 '''
 @app.route('/get/Info/<latitude>/<longtitude>')
@@ -228,4 +238,9 @@ def page_not_found(error):
     return "Page not found", 404
 
 if __name__ == '__main__':
+    engine = create_engine('sqlite:///database.db')
+    Base.metadata.create_all(engine)
+    DBSession = sessionmaker(bind=engine)
+    session = DBSession()
     app.run(debug=True, host='0.0.0.0')
+

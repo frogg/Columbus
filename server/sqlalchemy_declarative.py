@@ -1,6 +1,7 @@
 import os
 import sys
-from sqlalchemy import Column, ForeignKey, Integer, String, Boolean
+#from sqlalchemy import Column, ForeignKey, Integer, String, Boolean, Double Trick:
+from sqlalchemy import *
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from sqlalchemy import create_engine
@@ -22,6 +23,8 @@ class Artikel(Base):
     __tablename__ = 'artikel'
     id = Column(Integer, primary_key=True)
     pageWikiId = Column(Integer)
+    latitude = Column(Float)
+    longitude = Column(Float)
     gattung = Column(String(50))
     schlagworter = relationship('Schlagwort', backref='artikel',
                             collection_class=ordering_list('position'),
@@ -63,6 +66,3 @@ class PersonalizedArtikel(Base):
     liked = Column(Boolean, default = True)
     counter = Column(Integer, default = 0)
     #timespent = Zeit
-
-engine = create_engine('sqlite:///database.db')
-Base.metadata.create_all(engine)
