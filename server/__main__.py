@@ -57,11 +57,11 @@ class location():
 
 def getPlacesAtLocation(lattitude, longitude, radius, types):
     types = "|".join(types)
-    r = requests.get('https://maps.googleapis.com/maps/api/place/radarsearch/json?location='+str(lattitude)+','+str(longitude)+'&radius='+str(radius)+'&types='+types+'&key=AIzaSyAd_yIgEyAddkiGQQapy-Cxo2BypNGdsNo').json()
+    result = {}
     try:
+        r = requests.get('https://maps.googleapis.com/maps/api/place/radarsearch/json?location='+str(lattitude)+','+str(longitude)+'&radius='+str(radius)+'&types='+types+'&key=AIzaSyAd_yIgEyAddkiGQQapy-Cxo2BypNGdsNo').json()
         placeID = r['results'][0]['place_id']
         r = requests.get('https://maps.googleapis.com/maps/api/place/details/json?placeid='+placeID+'&key=AIzaSyAd_yIgEyAddkiGQQapy-Cxo2BypNGdsNo').json()
-        result = {}
         try:
             result['types'] = r['result']['types']
         except KeyError:
@@ -82,11 +82,11 @@ def getPlacesAtLocation(lattitude, longitude, radius, types):
         except KeyError:
             result['open_now'] = None
             result['opening_times'] = None
-        return result
     except IndexError:
         result['types'] = None
         result['open_now'] = None
         result['opening_times'] = None
+    return result
 
 
 def geosearch(latitude, longtitude, gtype,radius): 
