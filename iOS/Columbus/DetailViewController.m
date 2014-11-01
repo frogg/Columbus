@@ -19,7 +19,11 @@
     self=[super initWithNibName:nil bundle:nil];
     
     if(self) {
+        self.view.backgroundColor=[UIColor whiteColor];
+        self.institution=institution;
         institutionImage = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, 200)];
+        institutionImage.contentMode=UIViewContentModeScaleAspectFill;
+        institutionImage.clipsToBounds=YES;
         void (^block)(UIImage *) = ^(UIImage *image) {
             [self performSelectorInBackground:@selector(blurImageInBackground:) withObject:image];
         };
@@ -28,16 +32,20 @@
         
         [self.view addSubview:institutionImage];
         
-        webView = [[UIWebView alloc] initWithFrame:CGRectMake(0, 200, self.view.frame.size.width, self.view.frame.size.height-200)];
+        webView = [[UIWebView alloc] initWithFrame:CGRectMake(0, 100, self.view.frame.size.width, self.view.frame.size.height-100)];
         [self.view addSubview:webView];
-        [webView loadHTMLString:@"TEST<br><b>Test</b>" baseURL:nil];
-        
+        [webView loadHTMLString:[self getHTMlString] baseURL:nil];
+        webView.opaque=NO;
+        webView.backgroundColor=[UIColor clearColor];
         
         UIButton *back = [UIButton buttonWithType:UIButtonTypeCustom];
         [back addTarget:self action:@selector(back) forControlEvents:UIControlEventTouchUpInside];
         [back setImage:[UIImage imageNamed:@"back_light.png"] forState:UIControlStateNormal];
         back.frame=CGRectMake(15, 35, 24, 24);
         [self.view addSubview:back];
+        
+        
+        
     }
     return self;
 }
@@ -57,8 +65,17 @@
 }
 
 -(void) blurImageInBackground:(UIImage *) image {
-    image = [image applyBlurWithRadius:2 tintColor:[UIColor colorWithRed:0 green:0 blue:0 alpha:0.0] saturationDeltaFactor:1.0 maskImage:nil];
+    image = [image applyBlurWithRadius:10 tintColor:[UIColor colorWithRed:0 green:0 blue:0 alpha:0.6] saturationDeltaFactor:1.0 maskImage:nil];
     [institutionImage performSelectorOnMainThread:@selector(setImage:) withObject:image waitUntilDone:NO];
+}
+
+-(NSString *) getHTMlString {
+    
+    return [NSString stringWithFormat:@"<html><head><style type=\"text/css\">tit {	font-size: 27;    font-family: HelveticaNeue-Medium;    color: #BD997C;} sub {	font-size: 17;    font-family: HelveticaNeue-light;    color: #BD997C;}  txt {	font-size: 17;    font-family: HelveticaNeue-light;    color: #000000;}    </style></head><center><tit>%@</tit><br><sub>%@</sub><br><br><br><br></center><txt>%@</txt></br></html>",self.institution.name,self.institution.type,self.institution.beschreibung];
+}
+
+-(UIStatusBarStyle)preferredStatusBarStyle{
+    return UIStatusBarStyleLightContent;
 }
 
 /*

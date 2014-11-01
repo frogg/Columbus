@@ -14,6 +14,6 @@
 #import "AktuellsteListe.h"
 
 @interface KarteViewController : UIViewController <MenuDelegate>
-
+@property(nonatomic)RMMapView *mapView;
 
 @end

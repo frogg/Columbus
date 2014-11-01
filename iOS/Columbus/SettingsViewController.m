@@ -17,7 +17,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.view.backgroundColor=[UIColor darkGrayColor];
-    CircularSliderView *maxdistance = [[CircularSliderView alloc] initWithMinValue:100 maxValue:2000 initialValue:250 withType:0];
+    CircularSliderView *maxdistance = [[CircularSliderView alloc] initWithMinValue:100 maxValue:2000 initialValue:[[LocalDataBase meter] intValue] withType:0];
     maxdistance.frame=CGRectMake(0, 20, self.view.frame.size.width, 200);
     maxdistance.clipsToBounds=NO;
     [self.view addSubview:maxdistance];
@@ -43,7 +43,7 @@
     trenner.contentMode=UIViewContentModeScaleAspectFit;
     [self.view addSubview:trenner];
     
-    CircularSliderView *sliderView = [[CircularSliderView alloc] initWithMinValue:10 maxValue:180 initialValue:10 withType:1];
+    CircularSliderView *sliderView = [[CircularSliderView alloc] initWithMinValue:10 maxValue:180 initialValue:[[LocalDataBase time] intValue] withType:1];
     sliderView.frame=CGRectMake(0, 370, self.view.frame.size.width, 200);
     sliderView.clipsToBounds=NO;
 

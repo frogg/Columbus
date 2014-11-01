@@ -15,12 +15,14 @@ static Institution *lastPush;
 @implementation AppDelegate
 
 bool openedFromNotification;
-NSString *IP = @"192.168.1.83:4000";
+
 BOOL firststart;
 
 @synthesize locationManager,firstView;
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+    
+    [LocalDataBase checkIfUserIsAlreadyRegistered];
     firststart=true;
     self.window = [[MBFingerTipWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     [self.window makeKeyAndVisible];
@@ -39,7 +41,6 @@ BOOL firststart;
     notificationAction2.activationMode = UIUserNotificationActivationModeBackground;
     notificationAction2.destructive = YES;
     notificationAction2.authenticationRequired = NO;
-    
     
     
     UIMutableUserNotificationCategory *notificationCategory = [[UIMutableUserNotificationCategory alloc] init];
@@ -66,7 +67,7 @@ BOOL firststart;
     self.window.rootViewController = navigationController;
     
     [locationManager startUpdatingLocation];
-    
+    [navigationController setNavigationBarHidden:YES animated:NO];
     
     return YES;
 }
@@ -92,7 +93,9 @@ BOOL firststart;
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         // do your background tasks here
-        NSMutableURLRequest *request =[NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://%@/get/articles/%f/%f?radius=1000",IP,newLocation.coordinate.latitude,newLocation.coordinate.longitude]]];
+        NSMutableURLRequest *request =[NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://%@/get/articles/%f/%f?radius=1000&user=%@",[IP getIP],newLocation.coordinate.latitude,newLocation.coordinate.longitude,[LocalDataBase UUID]]]];
+        
+        //NSLog([NSString stringWithFormat:@"http://%@/get/articles/%f/%f?radius=1000&user=%@",[IP getIP],newLocation.coordinate.latitude,newLocation.coordinate.longitude,[LocalDataBase UUID]]);
         //    NSMutableURLRequest *request =[NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://google.de/%f/%f",newLocation.coordinate.latitude,newLocation.coordinate.longitude]]];
         
         [request setHTTPMethod:@"GET"];
@@ -107,16 +110,20 @@ BOOL firststart;
         
         // when that method finishes you can run whatever you need to on the main thread
         dispatch_async(dispatch_get_main_queue(), ^{
-            NSString *result =[[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding];
-            NSLog(result);
+            
             
             if(responseData) {
+                //NSString *result =[[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding];
+                //NSLog(result);
                 NSDictionary *dic = [NSJSONSerialization JSONObjectWithData:responseData options:0 error:nil];
                 
                 
                 NSArray *institutionen = [dic objectForKey:@"notes"];
                 
                 NSMutableArray *institutions = [[NSMutableArray alloc] init];
+                
+                
+                
                 if(institutionen && [institutionen count]>0) {
                     for(NSDictionary *institutionDic in institutionen) {
                         Institution *institution = [[Institution alloc] init];
@@ -126,13 +133,28 @@ BOOL firststart;
                         
                         
                         institution.name=[institutionDic objectForKey:@"name"];
-                        institution.type=[institutionDic objectForKey:@"type"];
+                        
                         institution.imageURL=[institutionDic objectForKey:@"imageurl"];
                         institution.location=CLLocationCoordinate2DMake(lat, lon);
                         institution.distance= [newLocation distanceFromLocation:[[CLLocation alloc] initWithLatitude:institution.location.latitude longitude:institution.location.longitude]];
                         
                         institution.uuid=[institutionDic objectForKey:@"pageid"];
+                       
+                        NSLog(@"%@",institution.uuid);
+                        
+                        
                         institution.keywords=[institutionDic objectForKey:@"schlagworte"];
+                        if([institutionDic objectForKey:@"address"]!=[NSNull null]) {
+                            institution.stadt=[[[[[institutionDic objectForKey:@"address"] componentsSeparatedByString:@", Germany"] objectAtIndex:0] componentsSeparatedByString:@" "] lastObject];
+                        } else {
+                            institution.stadt=@"";
+                        }
+                        
+                        if([institutionDic objectForKey:@"type"]!=[NSNull null]) {
+                            institution.type=[institutionDic objectForKey:@"type"];
+                        } else {
+                            institution.type=@"";
+                        }
                         
                         [institutions addObject:institution];
                         
@@ -210,13 +232,8 @@ BOOL firststart;
         NSLog(@"YES");
         firststart=false;
     }
- 
+    
 }
-
-+(NSString *) IP {
-    return IP;
-}
-
 
 
 @end

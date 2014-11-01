@@ -14,6 +14,7 @@
 
 @property(nonatomic) UIImageView *institutionImage;
 @property(nonatomic) UIWebView *webView;
+@property(nonatomic) Institution *institution;
 
 -(id) initWithInstitution:(Institution *) institution;
 

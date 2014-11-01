@@ -9,6 +9,7 @@
 #import <UIKit/UIKit.h>
 #import "CircularSliderView.h"
 #import "MenuView.h"
+#import "LocalDataBase.h"
 
 @interface SettingsViewController : UIViewController<CircularSliderDelegate>
 @property(nonatomic) UILabel *frequenzDetail;

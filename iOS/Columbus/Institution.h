@@ -14,13 +14,15 @@
 
 @property(readwrite) NSString *name;
 @property(readwrite) double distance;
-@property(readwrite) NSString *uuid;
+@property(readwrite) NSNumber *uuid;
 @property(readwrite) NSArray *keywords;
 @property(readwrite) NSString *type;
 @property(readwrite) NSString *openingHours;
 @property(readwrite) UIImage *image;
 @property(readwrite) NSString *imageURL;
+@property(readwrite) NSString *stadt;
 @property(readwrite) CLLocationCoordinate2D location;
+@property(readwrite) NSString *beschreibung;
 
 -(void) imageUsingBlock:(void (^)(UIImage *image))block;
 

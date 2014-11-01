@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "IP.h"
 
 @interface LocalDataBase : NSObject
 
@@ -18,7 +19,7 @@
 
 +(void) setTime:(NSString *)string;
 +(NSString *) time;
-
++(void) checkIfUserIsAlreadyRegistered;
 
 
 @end

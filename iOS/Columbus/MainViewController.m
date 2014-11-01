@@ -16,23 +16,23 @@
 @synthesize institutionOverView,aktuell;
 
 
-
-
-- (void)viewDidLoad {
-    [self.navigationController setNavigationBarHidden:YES animated:NO];
-    [super viewDidLoad];
-    self.title=@"Columbus";
-    self.view.backgroundColor=[UIColor whiteColor];
-    
-    
-
-    
-    
-    UIImageView *image = [[UIImageView alloc] initWithFrame:self.view.frame];
-    image.image=[UIImage imageNamed:@"loading_screen.png"];
-    image.contentMode=UIViewContentModeScaleAspectFill;
-    [self.view addSubview:image];
-    
+-(id) init {
+    self = [super initWithNibName:nil bundle:nil];
+    if(self) {
+        
+        [super viewDidLoad];
+        self.title=@"Columbus";
+        self.view.backgroundColor=[UIColor whiteColor];
+        
+        
+        
+        
+        
+        UIImageView *image = [[UIImageView alloc] initWithFrame:self.view.frame];
+        image.image=[UIImage imageNamed:@"loading_screen.png"];
+        image.contentMode=UIViewContentModeScaleAspectFill;
+        [self.view addSubview:image];
+        
         [UIView animateWithDuration:0.5
                               delay:2
                             options: UIViewAnimationOptionCurveEaseOut
@@ -43,22 +43,30 @@
                          completion:^(BOOL finished)
          {
          }];
+        
+        institutionOverView = [[InstitutionOverviewView alloc] initWithFrame:self.view.frame];
+        [self.view addSubview:institutionOverView];
+        institutionOverView.delegate=self;
+        
+        UIButton *menu = [UIButton buttonWithType:UIButtonTypeCustom];
+        [menu addTarget:self action:@selector(menu) forControlEvents:UIControlEventTouchUpInside];
+        [menu setImage:[UIImage imageNamed:@"menu_dark.png"] forState:UIControlStateNormal];
+        menu.frame=CGRectMake(0, 35-15, 24+15, 24+15);
+        [self.view addSubview:menu];
+        
+        UIButton *settings = [UIButton buttonWithType:UIButtonTypeCustom];
+        [settings addTarget:self action:@selector(settings) forControlEvents:UIControlEventTouchUpInside];
+        [settings setImage:[UIImage imageNamed:@"settings_dark.png"] forState:UIControlStateNormal];
+        settings.frame=CGRectMake(self.view.frame.size.width-24-30, 35-15, 24+30, 24+15);
+        [self.view addSubview:settings];
+    }
+    
+    return self;
+}
 
-    institutionOverView = [[InstitutionOverviewView alloc] initWithFrame:self.view.frame];
-    [self.view addSubview:institutionOverView];
-    institutionOverView.delegate=self;
+
+- (void)viewDidLoad {
     
-    UIButton *menu = [UIButton buttonWithType:UIButtonTypeCustom];
-    [menu addTarget:self action:@selector(menu) forControlEvents:UIControlEventTouchUpInside];
-    [menu setImage:[UIImage imageNamed:@"menu_dark.png"] forState:UIControlStateNormal];
-    menu.frame=CGRectMake(0, 35-15, 24+15, 24+15);
-    [self.view addSubview:menu];
-    
-    UIButton *settings = [UIButton buttonWithType:UIButtonTypeCustom];
-    [settings addTarget:self action:@selector(settings) forControlEvents:UIControlEventTouchUpInside];
-    [settings setImage:[UIImage imageNamed:@"settings_dark.png"] forState:UIControlStateNormal];
-    settings.frame=CGRectMake(self.view.frame.size.width-24-30, 35-15, 24+30, 24+15);
-    [self.view addSubview:settings];
     
     // Do any additional setup after loading the view.
 }
@@ -92,9 +100,11 @@
 
 -(void) boring {
     
+    Institution *i =[AktuellsteListe aktuelleListe][aktuell%[[AktuellsteListe aktuelleListe] count]];
+    
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         // do your background tasks here
-        NSMutableURLRequest *request =[NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://%@/get/articles/%f/%f?radius=1000",IP,newLocation.coordinate.latitude,newLocation.coordinate.longitude]]];
+        NSMutableURLRequest *request =[NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://%@/post/user/profile/%@/%@?liked=false&time=0",[IP getIP],i.uuid,[LocalDataBase UUID]]]];
         //    NSMutableURLRequest *request =[NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://google.de/%f/%f",newLocation.coordinate.latitude,newLocation.coordinate.longitude]]];
         
         [request setHTTPMethod:@"POST"];
@@ -105,14 +115,17 @@
         
         NSURLResponse *response;
         NSError *err;
+        NSData *responseData = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&err];
+        NSString *result =[[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding];
+        
     });
-
+    
     
     
     
     aktuell++;
-    [institutionOverView setInstitution:[AktuellsteListe aktuelleListe][aktuell%10]];
-    
+    [institutionOverView setInstitution:[AktuellsteListe aktuelleListe][aktuell%[[AktuellsteListe aktuelleListe] count]]];
+    self.institution=[AktuellsteListe aktuelleListe][aktuell%[[AktuellsteListe aktuelleListe] count]];
     
     
     CATransition *animation = [CATransition animation];
@@ -131,8 +144,33 @@
 }
 
 -(void) like {
+    Institution *i =[AktuellsteListe aktuelleListe][aktuell%[[AktuellsteListe aktuelleListe] count]];
+    
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        // do your background tasks here
+        NSMutableURLRequest *request =[NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://%@/post/user/profile/%@/%@?liked=true&time=2010",[IP getIP],i.uuid,[LocalDataBase UUID]]]];
+        //    NSMutableURLRequest *request =[NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://google.de/%f/%f",newLocation.coordinate.latitude,newLocation.coordinate.longitude]]];
+        
+        [request setHTTPMethod:@"POST"];
+        
+        NSString *post = nil;
+        NSData *postData = [post dataUsingEncoding:NSASCIIStringEncoding allowLossyConversion:YES];
+        [request setHTTPBody:postData];
+        
+        NSURLResponse *response;
+        NSError *err;
+        NSData *responseData = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&err];
+        NSString *result =[[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding];
+
+        
+    });
+    
+    
+    
+    
     aktuell++;
-    [institutionOverView setInstitution:[AktuellsteListe aktuelleListe][aktuell%10]];
+    [institutionOverView setInstitution:[AktuellsteListe aktuelleListe][aktuell%[[AktuellsteListe aktuelleListe] count]]];
+    self.institution=[AktuellsteListe aktuelleListe][aktuell%[[AktuellsteListe aktuelleListe] count]];
     
     CATransition *animation = [CATransition animation];
     animation.type = @"rippleEffect";
@@ -150,7 +188,7 @@
     
     self.institution=institutionneu;
     [institutionOverView setInstitution:self.institution];
-
+    
 }
 
 
@@ -159,13 +197,13 @@
 }
 
 /*
-#pragma mark - Navigation
-
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
-}
-*/
+ #pragma mark - Navigation
+ 
+ // In a storyboard-based application, you will often want to do a little preparation before navigation
+ - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+ // Get the new view controller using [segue destinationViewController].
+ // Pass the selected object to the new view controller.
+ }
+ */
 
 @end

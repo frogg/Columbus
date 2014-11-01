@@ -114,8 +114,19 @@
     
     NSString *keywords = [institution.keywords componentsJoinedByString:@" | "];
     
+    NSString *subtitle=@"";
     
-    return [NSString stringWithFormat:@"<html><head><style type=\"text/css\">tit {	font-size: 27;    font-family: HelveticaNeue-Medium;    color: #BD997C;}  sub {	font-size: 17;    font-family: HelveticaNeue-light;    color: #BD997C;} td {	font-size: 17;    font-family: HelveticaNeue-Medium;    color: #BD997C;}  key {	font-size: 12;    font-family: HelveticaNeue-light;  color: #888078;}  body {    margin: 0; padding: 0;} html {    -webkit-text-size-adjust: none;}  </style></head><center><tit>%@</tit><br><sub>%@</sub></br><table><tr><td><img src=\"a.png\" width=74></td><td>%.0f m</td><td><img src=\"b.png\" width=74></td></tr></table><table width=250><tr><td><center><key>%@</key></center></td></tr></table></center></html>",institution.name,institution.type,institution.distance,keywords];
+    if(![institution.type isEqualToString:@""] && ![institution.stadt isEqualToString:@""]) {
+        subtitle = [NSString stringWithFormat:@"%@ | %@",institution.type,institution.stadt];
+    } else if(![institution.type isEqualToString:@""] && [institution.stadt isEqualToString:@""]) {
+        subtitle = [NSString stringWithFormat:@"%@",institution.type];
+    } else if([institution.type isEqualToString:@""] && ![institution.stadt isEqualToString:@""]) {
+        subtitle = [NSString stringWithFormat:@"%@",institution.stadt];
+    }
+    
+    
+    
+    return [NSString stringWithFormat:@"<html><head><style type=\"text/css\">tit {	font-size: 27;    font-family: HelveticaNeue-Medium;    color: #BD997C;}  sub {	font-size: 17;    font-family: HelveticaNeue-light;    color: #BD997C;} td {	font-size: 17;    font-family: HelveticaNeue-Medium;    color: #BD997C;}  key {	font-size: 12;    font-family: HelveticaNeue-light;  color: #888078;}  body {    margin: 0; padding: 0;} html {    -webkit-text-size-adjust: none;}  </style></head><center><tit>%@</tit><br><sub>%@</sub></br><table><tr><td><img src=\"a.png\" width=74></td><td>%.0f m</td><td><img src=\"b.png\" width=74></td></tr></table><table width=250><tr><td><center><key>%@</key></center></td></tr></table></center></html>",institution.name,subtitle,institution.distance,keywords];
 }
 
 /*

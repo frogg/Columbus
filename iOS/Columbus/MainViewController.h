@@ -14,6 +14,10 @@
 #import "KarteViewController.h"
 #import "Institution.h"
 #import "AktuellsteListe.h"
+#import "IP.h"
+#import "LocalDataBase.h"
+
+@import QuartzCore;
 
 @interface MainViewController : UIViewController <InstitutionOverViewDelegate,MenuDelegate>
 

@@ -11,15 +11,16 @@
 #import "Institution.h"
 #import "MBFingerTipWindow.h"
 #import "AktuellsteListe.h"
+#import "IP.h"
 @import CoreLocation;
 
 @interface AppDelegate : UIResponder <UIApplicationDelegate,CLLocationManagerDelegate>
 
-+(NSString *) IP;
+
 
 @property (strong, nonatomic) MBFingerTipWindow *window;
 @property(nonatomic) CLLocationManager *locationManager;
-@property(nonatomic)MainViewController *firstView;
+@property(nonatomic) MainViewController *firstView;
 
 @end
 
