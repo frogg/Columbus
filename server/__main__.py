@@ -1,7 +1,7 @@
 import wikipedia
 import json
 import requests
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 app = Flask(__name__)
 @app.route('/')
 def hi():
@@ -50,9 +50,9 @@ class location():
         }
         return dictionary
 
-def getPlacesAtLocation(lattitude, longitude, radius, types, name):
+def getPlacesAtLocation(lattitude, longitude, radius, types):
     types = "|".join(types)
-    r = requests.get('https://maps.googleapis.com/maps/api/place/radarsearch/json?location='+str(lattitude)+','+str(longitude)+'&radius='+str(radius)+'&types='+types+'&name='+name+'&key=AIzaSyAd_yIgEyAddkiGQQapy-Cxo2BypNGdsNo').json()
+    r = requests.get('https://maps.googleapis.com/maps/api/place/radarsearch/json?location='+str(lattitude)+','+str(longitude)+'&radius='+str(radius)+'&types='+types+'&key=AIzaSyAd_yIgEyAddkiGQQapy-Cxo2BypNGdsNo').json()
     try:
         placeID = r['results'][0]['place_id']
         r = requests.get('https://maps.googleapis.com/maps/api/place/details/json?placeid='+placeID+'&key=AIzaSyAd_yIgEyAddkiGQQapy-Cxo2BypNGdsNo').json()
@@ -125,6 +125,7 @@ def getPushLocations(latitude, longtitude):
     for article in geosearch(latitude, longtitude, 'landmark', 1000):
         if len(locations) > 5:
             break
+        print(request.args)
         title = article.get('title')
         latitude = article.get('lat')
         longtitude = article.get('lon')
@@ -174,8 +175,8 @@ def getLocations(latitude, longtitude, **kwargs):
     for article in geosearch(latitude, longtitude, 'landmark', 1000):
         if len(locations) > 5:
             break
-        if not kwargs.get('radius'):
-            radius = 1000
+        print(kwargs)
+        radius= 1000
         title = article.get('title')
         latitude = article.get('lat')
         longtitude = article.get('lon')
@@ -183,7 +184,22 @@ def getLocations(latitude, longtitude, **kwargs):
         page_ID = article.get('pageid')
 
         # Google Api
-        googleResults = getPlacesAtLocation(latitude, longtitude, radius, 'museum')
+        allowedtypes = [
+            'museum',
+            'aquarium',
+            'art_gallery',
+            'book_store',
+            'cemetery',
+            'church'
+            'city_hall',
+            'hindu_temple',
+            'library',
+            'museum',
+            'place_of_worship',
+            'stadium',
+            'university',
+            'zoo']
+        googleResults = getPlacesAtLocation(latitude, longtitude, radius, allowedtypes)
         types = googleResults.get('types')
         opening_hours = googleResults.get('opening_times'),
         open_now = googleResults.get('opening_now')
