@@ -57,3 +57,12 @@ class PersonalizedArtikel(Base):
     liked = Column(Boolean, default = True)
     counter = Column(Integer, default = 0)
     #timespent = Zeit
+
+class Rating(Base):
+    __tablename__ = 'rating'
+    id = Column(Integer, primary_key)
+    user_id = Column(Integer, ForeignKey('user.id'))
+    categoryName = Column(String)
+    likes = Column(Integer, default = 0)
+    dislikes = Column(Integer, default = 0)
+    totalLikeTime = Column(Integer, default = 0)
