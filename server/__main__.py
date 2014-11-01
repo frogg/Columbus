@@ -118,19 +118,9 @@ def getLocations(latitude, longtitude):
                          'oeffnungszeiten')
 
         locations.append(entry.toDict())
-<<<<<<< HEAD
+
 
     return jsonify({'notes':locations})
-'''
-@app.route('/get/userID')
-def pushLocations(latitude, longtitude):
-    return wikipedia.geosearch(latitude, longtitude)
-    return 'Hello World!'
-=======
-    for location in locations:
-        getSite(location.pageid)
-    return "sutff"
->>>>>>> 8fac7da4311521b98dc39c8b03900105e171f683
 
 
 @app.route('/get/userID')
