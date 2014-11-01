@@ -28,7 +28,7 @@ class pushNotificationResponse():
         return dictionary
 
 class location():
-    def __init__(self, name, gps, typ, distance, schlagworte, requestid, pageid, imageurl,oeffnungszeiten):
+    def __init__(self, name, gps, typ, distance, schlagworte, requestid, pageid, imageurl, opening_hours, open_now):
         self.name = name
         self.gps = gps
         self.typ = typ
@@ -37,7 +37,9 @@ class location():
         self.requestid = requestid
         self.pageid = pageid
         self.imageurl = imageurl
-        self.oeffnungszeiten = oeffnungszeiten
+        self.opening_hours = opening_hours
+        self.open_now = open_now
+
     def toDict(self):
         dictionary = {
             'name': self.name,
@@ -47,40 +49,78 @@ class location():
             'requestid': self.requestid,
             'pageid': self.pageid,
             'imageurl': self.imageurl,
-            'oeffnungszeiten': self.oeffnungszeiten
+            'opening_hours': self.opening_hours,
+            'open_now': self.open_now
         }
         return dictionary
 
+def getPlacesAtLocation(lattitude, longitude, radius, types):
+
+    r = requests.get('https://maps.googleapis.com/maps/api/place/radarsearch/json?location='+str(lattitude)+','+str(longitude)+'&radius='+str(radius)+'&types='+types+'&key=AIzaSyAd_yIgEyAddkiGQQapy-Cxo2BypNGdsNo').json()
+    try:
+        placeID = r['results'][0]['place_id']
+        r = requests.get('https://maps.googleapis.com/maps/api/place/details/json?placeid='+placeID+'&key=AIzaSyAd_yIgEyAddkiGQQapy-Cxo2BypNGdsNo').json()
+        result = {}
+        result['types'] = r['result']['types']
+        if r['result']['opening_hours']:
+            if r['result']['opening_hours']['open_now']:
+                result['open_now'] = r['result']['opening_hours']['open_now']
+            else:
+                result['open_now'] = False
+            result['opening_times'] = r['result']['opening_hours']['periods']
+            result['opening_times'] = {'mon': [1000, None, None, 1700],
+                                       'tue': [1000, None, None, 1700],
+                                       'wen': [1000, None, None, 1700],
+                                       'thu': [1000, None, None, 1700],
+                                       'fri': [1000, None, None, 1700],
+                                       'sat': [1000, None, None, 1700],
+                                       'sun': [1000, None, None, 1700]}
+
+        else:
+            result['open_now'] = None
+            result['opening_times'] = None
+        return result
+    except IndexError:
+        return None
+
+
 def geosearch(latitude, longtitude, gtype,radius): 
-    return apicall('en','query','json','geosearch',"&type={0}&gsradius={3}&gscoord={1}|{2}".format(gtype, latitude,longtitude,radius))
+    return apicall('en', 'query', 'json', "&type={0}&gsradius={3}&gscoord={1}|{2}&list=geosearch".format(gtype, latitude,longtitude,radius)).get('query').get('geosearch')
 
-def getSite(siteID):
 
-    pass
+def getImages(pageid):
+    images = []
 
-def apicall(language, action, response_format, listParams, specialValues):
-    r = requests.get("https://{0}.wikipedia.org/w/api.php?action={1}&format={2}&list={3}{4}".format(language,action,response_format,listParams,specialValues))
-    r = r.json().get('query').get('geosearch')
+    response= apicall('commons', 'query', 'json', "&pageids={0}&prop=imageinfo&iiprop=url".format(pageid)).get('query')
+    for page in response.get('pages'):
+        for image in response.get('pages').get(page).get('imageinfo'):
+            images.append(image.get('url'))
+    return images
+
+
+def apicall(language, action, response_format, specialValues):
+    r = requests.get("https://{0}.wikipedia.org/w/api.php?action={1}&format={2}{3}".format(language,action,response_format,specialValues))
+    r = r.json()
     return r
 
+
 def getSchlagworter(title, url):
-    test = "http://en.wikipedia.org/wiki/Mercedes-Benz";
-    r = requests.get('http://access.alchemyapi.com/calls/url/URLGetRankedKeywords?apikey=42918a4b1646af1e6e18c3048afced054c452dd4&url={0}&outputMode=json&maxRetrieve=10'.format(test))
+    r = requests.get('http://access.alchemyapi.com/calls/url/URLGetRankedKeywords?apikey=42918a4b1646af1e6e18c3048afced054c452dd4&url={0}&outputMode=json&maxRetrieve=7'.format(url))
     if not r.status_code == requests.codes.ok:
         return []
     z = r.json()
-    z = 0
+    count = 0
     keywords= []
     for word in z['keywords']:
-        if z < 5:
+        if count < 5:
             if title in word['text']:
                 print("It's there!!!")
-                z+= 1
+                count+= 1
             else:
                 keywords.append(word['text'])
         else:
             keywords.append(word['text'])
-    return keywords
+    return keywords[:5]
 
 @app.route('/get/locations/pushNotification/<latitude>/<longtitude>')
 def getPushLocations(latitude, longtitude):
@@ -100,22 +140,26 @@ def getPushLocations(latitude, longtitude):
         locations.append(entry.toDict())
     return jsonify({'notes':locations}), 200
 
+
 @app.route('/get/locations/<latitude>/<longtitude>')
 def getLocations(latitude, longtitude):
     locations = []
     for i in geosearch(latitude, longtitude, 'landmark', 1000):
-        if len(locations)>5:
+        if len(locations) > 5:
             break
+        page = wikipedia.page(i.get('title'), auto_suggest=True, redirect=False)
+        googleResults = getPlacesAtLocation(i.get('lat'), i.get('lon'), 1000, 'museum')
         entry = location(i.get('title'),
                          {'lat': i.get('lat'),
-                          'long': i.get('long')},
-                         "typ",
+                          'lon': i.get('lon')},
+                         googleResults.get('types'),
                          i.get('dist'),
-                         "test",
-                         getSchlagworter(wikipedia.summary(i.get('title'))),
+                         getSchlagworter(page.title, page.url),
+                         "tet",
                          i.get('pageid'),
-                         "http://upload.wikimedia.org/wikipedia/commons/1/1a/Mercedes-Benz_Museum_201312_02_sunset.jpg",
-                         'oeffnungszeiten')
+                         getImages(i.get('pageid')),
+                         googleResults.get('opening_times'),
+                         googleResults.get('opening_now'))
 
         locations.append(entry.toDict())
 
@@ -125,7 +169,7 @@ def getLocations(latitude, longtitude):
 
 @app.route('/get/userID')
 def getUserID():
-    return "QUAPPI RULES"
+    return "QUAPPI RUL€ZZZ"
     
 '''
 @app.route('/get/Info/<latitude>/<longtitude>')
