@@ -1,43 +1,33 @@
 import wikipedia
 import json
 import requests
-from flask import Flask, jsonify, request
-import sql
+import hashlib
+import markdown
+
+from flask import Flask, jsonify, request, render_template, Markup
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.exc import NoResultFound
-from sqlalchemy_declarative import *
-import hashlib
+from sqlalchemy_declarative import (Base,
+                                    User,
+                                    Artikel,
+                                    Schlagwort,
+                                    PersonalizedArtikel,
+                                    Rating)
+
+from Wikipedia_Entry import Wikipedia_Entry
+
 
 app = Flask(__name__)
+
+
 @app.route('/')
-def hi():
-    return "hey"
-
-class Wikipedia_Entry():
-    def __init__(self, name, gps, type, distance, schlagworte, pageid, imageurl, opening_hours, address):
-        self.name = name
-        self.gps = gps
-        self.type = type
-        self.distance = distance
-        self.schlagworte = schlagworte
-        self.pageid = pageid
-        self.imageurl = imageurl
-        self.opening_hours = opening_hours
-        self.address = address
-
-    def toDict(self):
-        dictionary = {
-            'name': self.name,
-            'gps': self.gps,
-            'type': self.type,
-            'schlagworte': self.schlagworte,
-            'pageid': self.pageid,
-            'imageurl': self.imageurl,
-            'opening_hours': self.opening_hours,
-            'address': self.address
-        }
-        return dictionary
+def readme():
+    with open ("README.md", "r") as myfile:
+        content = myfile.read()
+        content = Markup(markdown.markdown(content))
+    return render_template('index.html', **locals())
 
 
 def getPlacesAtLocation(lattitude, longitude, radius, types):
@@ -240,7 +230,7 @@ def getLocations(latitude, longitude, **kwargs):
                 new_articel.schlagworter.append(k)            
 
             session.add(new_articel)
-            #session.commit()
+            session.commit()
 
         entry = Wikipedia_Entry(title,
                                 {'lat': latitude,
@@ -297,12 +287,7 @@ def setUserInfo(pageid, userID):
     session.add(paritkel)
     session.commit()
     return jsonify({'sucess': True})
-'''
-@app.route('/get/Info/<latitude>/<longitude>')
-def pushLocations(latitude, longitude):
-    return wikipedia.geosearch(latitude, longitude)
-    return 'Hello World!'
-'''
+
 @app.errorhandler(404)
 def page_not_found(error):
     return "Page not found", 404
@@ -313,7 +298,7 @@ if __name__ == '__main__':
     mysqluser = 'root'
     mysqlpassword = 'asdf1234'
     mysqldb = 'kolumbus'
-    engine = create_engine("mysql+pymysql://{0}:{1}@{2}/{3}"
+    engine = create_engine("mysql+pymysql://{0}:{1}@{2}/{3}?charset=utf8"
                        .format(mysqluser, mysqlpassword, mysqlhost, mysqldb),
                        encoding='utf-8', echo=False)
     Base.metadata.create_all(engine)
