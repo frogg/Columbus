@@ -200,11 +200,10 @@ def getLocations(latitude, longtitude, **kwargs):
         for article_datenbank in session.query(Artikel).all():
             if article_datenbank.pageWikiId == page_ID:
                 alreadyLoaded = true;
-                opening_hours = article_datenbank.offnungszeiten
+                opening_hours = jsonify({'opening_hours': article_datenbank.offnungszeiten})
                 gattung = article_datenbank.gattung
                 #open_now = TO BE CALCULATED FROM OPENING HOURS
-                images = article_datenbank.picUrls
-                #page
+                image = article_datenbank.picUrl
                 #keywords liste
 
         #article isn#t stored already => load Data and save to DataBase
@@ -233,21 +232,17 @@ def getLocations(latitude, longtitude, **kwargs):
 
             # Wiki Api
             images = getImages(page_ID)
+            image = "TBD"
             page = wikipedia.page(title, auto_suggest=True, redirect=False)
 
             # Alchemy Api
             keywords = getSchlagworter(page.title, page.url)
 
-            new_articel = Artikel(pageWikiId = page_ID, gattung = gattung, offnungszeiten = opening_hours, title = title, url = page)
+            new_articel = Artikel(pageWikiId = page_ID, gattung = gattung, offnungszeiten = opening_hours, title = title, url = page, picUrl = image)
             for key in keywords:
                 k = Schlagwort(text = key)
                 session.add(k)
-                new_articel.schlagworter.append(k)
-
-            for img in images:
-                i = PicUrl(url = img)
-                session.add(i)
-                new_articel.schlagworter.append(i)
+                new_articel.schlagworter.append(k)            
 
             session.add(new_articel)
             session.commit()
