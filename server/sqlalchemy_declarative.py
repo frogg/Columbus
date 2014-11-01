@@ -29,9 +29,9 @@ class Artikel(Base):
     schlagworter = relationship('Schlagwort', backref='artikel',
                             collection_class=ordering_list('position'),
                             order_by='Schlagwort.position')
-    picUrl = Column(String(50))
+    picUrl = Column(String(300))
     offnungszeiten = Column(String(50))
-    url = Column(String(50))
+    url = Column(String(300))
     title = Column(String(50))
 
 

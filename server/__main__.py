@@ -98,10 +98,12 @@ def geosearch(latitude, longitude, gtype,radius):
 def getImage(page_IDs):
     page_IDs = "|".join(page_IDs)
     response= apicall('en', 'query', 'json', "&prop=pageimages&inprop=url&pageids={0}&pithumbsize=600".format(page_IDs)).get('query')
-
-    for page in response.get('pages'):
-        image = response.get('pages').get(page).get('thumbnail').get('source')
-    return image
+    try:
+        for page in response.get('pages'):
+            image = response.get('pages').get(page).get('thumbnail').get('source')#
+        return image
+    except AttributeError:
+        return None
 
 
 def apicall(language, action, response_format, specialValues):
@@ -138,7 +140,7 @@ def getLocations(latitude, longitude, **kwargs):
     userID = request.args.get('userID')
     databaseQueryAllArticels = session.query(Artikel).all()
     for article in geosearch(latitude, longitude, 'landmark', radius):
-        if len(articles) > 5:
+        if len(articles) > 50:
             break
         title = article.get('title')
         latitude = article.get('lat')
