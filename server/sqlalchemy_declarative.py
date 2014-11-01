@@ -29,9 +29,7 @@ class Artikel(Base):
     schlagworter = relationship('Schlagwort', backref='artikel',
                             collection_class=ordering_list('position'),
                             order_by='Schlagwort.position')
-    picUrls = relationship('PicUrl', backref='artikel',
-                            collection_class=ordering_list('position'),
-                            order_by='PicUrl.position')
+    picUrl = Column(String(50))
     offnungszeiten = Column(String(50))
     url = Column(String(50))
     title = Column(String(50))
@@ -47,13 +45,6 @@ class Schlagwort(Base):
 
     def __repr__(self):
         return str(self.id)+self.text
-
-class PicUrl(Base):
-    __tablename__ = 'picUrl'
-    id = Column(Integer, primary_key=True)
-    slide_id = Column(Integer, ForeignKey('artikel.id'))
-    position = Column(Integer)
-    url = Column(String)
 
 
 class PersonalizedArtikel(Base):

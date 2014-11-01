@@ -59,12 +59,11 @@ class Wikipedia_Entry():
 
 def getPlacesAtLocation(lattitude, longitude, radius, types):
     types = "|".join(types)
-    r = requests.get('https://maps.googleapis.com/maps/api/place/radarsearch/json?location='+str(lattitude)+','+str(longitude)+'&radius='+str(radius)+'&types='+types+'&key=AIzaSyAd_yIgEyAddkiGQQapy-Cxo2BypNGdsNo').json()
     result = {}
     try:
+        r = requests.get('https://maps.googleapis.com/maps/api/place/radarsearch/json?location='+str(lattitude)+','+str(longitude)+'&radius='+str(radius)+'&types='+types+'&key=AIzaSyAd_yIgEyAddkiGQQapy-Cxo2BypNGdsNo').json()
         placeID = r['results'][0]['place_id']
         r = requests.get('https://maps.googleapis.com/maps/api/place/details/json?placeid='+placeID+'&key=AIzaSyAd_yIgEyAddkiGQQapy-Cxo2BypNGdsNo').json()
-        
         try:
             result['types'] = r['result']['types']
         except KeyError:
@@ -85,7 +84,6 @@ def getPlacesAtLocation(lattitude, longitude, radius, types):
         except KeyError:
             result['open_now'] = None
             result['opening_times'] = None
-        
     except IndexError:
         result['types'] = None
         result['open_now'] = None
@@ -201,9 +199,59 @@ def getLocations(latitude, longtitude, **kwargs):
         longtitude = article.get('lon')
         distance = article.get('dist')
         page_ID = article.get('pageid')
+        #url = TBD
 
-        #check if artikel has been loaded already
-        
+        #check if article has been loaded already => lade article_datenbank
+        alreadyLoaded = false
+        for article_datenbank in session.query(Artikel).all():
+            if article_datenbank.pageWikiId == page_ID:
+                alreadyLoaded = true;
+                opening_hours = jsonify({'opening_hours': article_datenbank.offnungszeiten})
+                gattung = article_datenbank.gattung
+                #open_now = TO BE CALCULATED FROM OPENING HOURS
+                image = article_datenbank.picUrl
+                #keywords liste auslesen
+
+        #article isn#t stored already => load Data and save to DataBase
+        if not alreadyLoaded:
+             # Google Api
+            allowedtypes = [
+                'museum',
+                'aquarium',
+                'art_gallery',
+                'book_store',
+                'cemetery',
+                'church'
+                'city_hall',
+                'hindu_temple',
+                'library',
+                'museum',
+                'place_of_worship',
+                'stadium',
+                'university',
+                'zoo']
+            googleResults = getPlacesAtLocation(latitude, longtitude, radius, allowedtypes)
+            #types = googleResults.get('types')
+            gattung = "MuseumTBD"
+            opening_hours = googleResults.get('opening_times'),
+            open_now = googleResults.get('opening_now')
+
+            # Wiki Api
+            images = getImages(page_ID)
+            image = "TBD"
+            page = wikipedia.page(title, auto_suggest=True, redirect=False)
+
+            # Alchemy Api
+            keywords = getSchlagworter(page.title, page.url)
+
+            new_articel = Artikel(pageWikiId = page_ID, gattung = gattung, offnungszeiten = opening_hours, title = title, url = page, picUrl = image)
+            for key in keywords:
+                k = Schlagwort(text = key)
+                session.add(k)
+                new_articel.schlagworter.append(k)            
+
+            session.add(new_articel)
+            session.commit()
 
         # Google Api
         allowedtypes = [
@@ -248,6 +296,7 @@ def getLocations(latitude, longtitude, **kwargs):
 
         articles.append(entry.toDict())
     return jsonify({'notes': articles})
+
 @app.route('/get/details/<pageid>')
 def getDetails(pageid):
     
@@ -259,6 +308,23 @@ def getUserID():
     session.add(new_user)
     session.commit()
     return jsonify({'userID':new_user.id})
+
+@app.route('/post/user/profile/<pageid>/<userID>')
+def setUserInfo(pageid, userID):
+    liked=request.args.get('liked', True)
+    user = session.query(User).filter(User.id == userID).one()
+    bereitsVorhanden = false
+    for pArtikel in session.query(PersonalizedArtikel).filter(PersonalizedArtikel.user == user).all():
+        if(pArtikel.artikel.pageWikiId == pageid):
+            bereitsVorhanden = true
+            pArtikel.liked = False
+
+    if not bereitsVorhanden
+    article = session.query(Artikel).filter(Artikel.pageWikiId == pageid).one()
+    paritkel = PersonalizedArtikel(user=user, artikel=article, liked = liked, counter = 0)
+        session.add(paritkel)
+        session.commit()
+
     
 '''
 @app.route('/get/Info/<latitude>/<longtitude>')
