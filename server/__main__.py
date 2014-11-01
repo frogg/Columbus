@@ -193,38 +193,65 @@ def getLocations(latitude, longtitude, **kwargs):
         longtitude = article.get('lon')
         distance = article.get('dist')
         page_ID = article.get('pageid')
+        #url = TBD
 
-        #check if artikel has been loaded already
+        #check if article has been loaded already => lade article_datenbank
+        alreadyLoaded = false
+        for article_datenbank in session.query(Artikel).all():
+            if article_datenbank.pageWikiId == page_ID:
+                alreadyLoaded = true;
+                opening_hours = article_datenbank.offnungszeiten
+                gattung = article_datenbank.gattung
+                #open_now = TO BE CALCULATED FROM OPENING HOURS
+                images = article_datenbank.picUrls
+                #page
+                #keywords liste
+
+        #article isn#t stored already => load Data and save to DataBase
+        if not alreadyLoaded:
+             # Google Api
+            allowedtypes = [
+                'museum',
+                'aquarium',
+                'art_gallery',
+                'book_store',
+                'cemetery',
+                'church'
+                'city_hall',
+                'hindu_temple',
+                'library',
+                'museum',
+                'place_of_worship',
+                'stadium',
+                'university',
+                'zoo']
+            googleResults = getPlacesAtLocation(latitude, longtitude, radius, allowedtypes)
+            #types = googleResults.get('types')
+            gattung = "MuseumTBD"
+            opening_hours = googleResults.get('opening_times'),
+            open_now = googleResults.get('opening_now')
+
+            # Wiki Api
+            images = getImages(page_ID)
+            page = wikipedia.page(title, auto_suggest=True, redirect=False)
+
+            # Alchemy Api
+            keywords = getSchlagworter(page.title, page.url)
+
+            new_articel = Artikel(pageWikiId = page_ID, gattung = gattung, offnungszeiten = opening_hours, title = title, url = page)
+            for key in keywords:
+                k = Schlagwort(text = key)
+                session.add(k)
+                new_articel.schlagworter.append(k)
+
+            for img in images:
+                i = PicUrl(url = img)
+                session.add(i)
+                new_articel.schlagworter.append(i)
+
+            session.add(new_articel)
+            session.commit()
         
-
-        # Google Api
-        allowedtypes = [
-            'museum',
-            'aquarium',
-            'art_gallery',
-            'book_store',
-            'cemetery',
-            'church'
-            'city_hall',
-            'hindu_temple',
-            'library',
-            'museum',
-            'place_of_worship',
-            'stadium',
-            'university',
-            'zoo']
-        googleResults = getPlacesAtLocation(latitude, longtitude, radius, allowedtypes)
-        types = googleResults.get('types')
-        opening_hours = googleResults.get('opening_times'),
-        open_now = googleResults.get('opening_now')
-
-        # Wiki Api
-        images = getImages(page_ID)
-        page = wikipedia.page(title, auto_suggest=True, redirect=False)
-
-        # Alchemy Api
-        keywords = getSchlagworter(page.title, page.url)
-
 
         entry = location(title,
                          {'lat': latitude,
@@ -240,6 +267,8 @@ def getLocations(latitude, longtitude, **kwargs):
 
         locations.append(entry.toDict())
     return jsonify({'notes': locations})
+
+
 @app.route('/get/details/<pageid>')
 def getDetails(pageid):
     
