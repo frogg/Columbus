@@ -8,7 +8,18 @@
 
 #import <UIKit/UIKit.h>
 #import "DetailViewController.h"
+#import "SettingsViewController.h"
+#import "InstitutionOverviewView.h"
+#import "MenuView.h"
+#import "KarteViewController.h"
+#import "Institution.h"
+#import "AktuellsteListe.h"
 
-@interface MainViewController : UIViewController
+@interface MainViewController : UIViewController <InstitutionOverViewDelegate,MenuDelegate>
 
+@property(nonatomic) InstitutionOverviewView *institutionOverView;
+@property(nonatomic) Institution *institution;
+@property(nonatomic) int aktuell;
+
+-(void) newInstitution:(Institution *) institutionneu;
 @end
