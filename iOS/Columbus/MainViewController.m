@@ -91,6 +91,25 @@
 }
 
 -(void) boring {
+    
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        // do your background tasks here
+        NSMutableURLRequest *request =[NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://%@/get/articles/%f/%f?radius=1000",IP,newLocation.coordinate.latitude,newLocation.coordinate.longitude]]];
+        //    NSMutableURLRequest *request =[NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://google.de/%f/%f",newLocation.coordinate.latitude,newLocation.coordinate.longitude]]];
+        
+        [request setHTTPMethod:@"POST"];
+        
+        NSString *post = nil;
+        NSData *postData = [post dataUsingEncoding:NSASCIIStringEncoding allowLossyConversion:YES];
+        [request setHTTPBody:postData];
+        
+        NSURLResponse *response;
+        NSError *err;
+    });
+
+    
+    
+    
     aktuell++;
     [institutionOverView setInstitution:[AktuellsteListe aktuelleListe][aktuell%10]];
     

@@ -15,6 +15,8 @@
 
 @interface AppDelegate : UIResponder <UIApplicationDelegate,CLLocationManagerDelegate>
 
++(NSString *) IP;
+
 @property (strong, nonatomic) MBFingerTipWindow *window;
 @property(nonatomic) CLLocationManager *locationManager;
 @property(nonatomic)MainViewController *firstView;

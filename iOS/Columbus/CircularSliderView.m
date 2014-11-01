@@ -24,7 +24,7 @@
 @implementation CircularSliderView
 
 
-@synthesize barCenter,knobCenter,barRadius,knobRadius,knobAngle,minValue,maxValue,isKnobBeingTouched,valueLabel;
+@synthesize barCenter,knobCenter,barRadius,knobRadius,knobAngle,minValue,maxValue,isKnobBeingTouched,valueLabel,delegate;
 -(id)initWithMinValue:(float)minimumValue maxValue:(float)maximumValue initialValue:(float)initialValue withType:(int) type
 {
     self = [super init];
@@ -45,18 +45,18 @@
         valueLabel = [[UILabel alloc] init];
         valueLabel.textAlignment = NSTextAlignmentCenter;
         valueLabel.frame=CGRectMake(0, 0, self.frame.size.width, self.frame.size.height);
-        if(self.type==0) {
-            valueLabel.font=[UIFont fontWithName:@"Helveticaneue-ultralight" size:60];
-        } else {
-            valueLabel.font=[UIFont fontWithName:@"Helveticaneue-ultralight" size:50];
-        }
+        
+        valueLabel.font=[UIFont fontWithName:@"Helveticaneue-ultralight" size:50];
+        
         
         valueLabel.textColor=[UIColor whiteColor];
         [valueLabel setText:[self displayStringFromValue:[self value]]];
         [self addSubview:valueLabel];
+        
     }
     return self;
 }
+
 
 -(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
 {
@@ -160,25 +160,29 @@
 }
 -(void) layoutSubviews {
     [super layoutSubviews];
+    [self displayStringFromValue:self.value];
     valueLabel.frame=CGRectMake(0, 0, self.frame.size.width, self.frame.size.height);
 }
 
 -(NSString *) displayStringFromValue:(float) value {
     if(self.type==0) {
         if(value<1000) {
+            [delegate newOutputString:[NSString stringWithFormat:@"%.0f m",value] forType:0];
             return [NSString stringWithFormat:@"%.0f m",value];
         }
+        [delegate newOutputString:[NSString stringWithFormat:@"%.1f km",value/1000] forType:0];
         return [NSString stringWithFormat:@"%.1f km",value/1000];
     }
     
     if(value<60) {
+        [delegate newOutputString:[NSString stringWithFormat:@"%.0f min",value] forType:1];
         return [NSString stringWithFormat:@"%.0f min",value];
     }
     
     NSString *stunden = [NSString stringWithFormat:@"%.0f",value/60];
     NSString *minuten = [NSString stringWithFormat:@"%02.0f",value-(60*(floor(value/60.0)))];
     
-    
+    [delegate newOutputString:[NSString stringWithFormat:@"%@:%@ h",stunden,minuten] forType:1];
     return [NSString stringWithFormat:@"%@:%@ h",stunden,minuten];
     
 }

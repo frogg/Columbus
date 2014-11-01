@@ -213,6 +213,10 @@ BOOL firststart;
  
 }
 
++(NSString *) IP {
+    return IP;
+}
+
 
 
 @end

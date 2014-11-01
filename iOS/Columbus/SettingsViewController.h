@@ -10,6 +10,8 @@
 #import "CircularSliderView.h"
 #import "MenuView.h"
 
-@interface SettingsViewController : UIViewController
+@interface SettingsViewController : UIViewController<CircularSliderDelegate>
+@property(nonatomic) UILabel *frequenzDetail;
+@property(nonatomic) UILabel *radiusDetail;
 
 @end
