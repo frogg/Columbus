@@ -2,6 +2,8 @@ import wikipedia
 import json
 import requests
 from flask import Flask, jsonify, request
+import sql
+
 app = Flask(__name__)
 @app.route('/')
 def hi():
