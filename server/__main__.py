@@ -40,13 +40,14 @@ def apicall(language, action, response_format, listParams, specialValues):
     return r
 
 def getSchlagworter(content):
-    r = requests.get('https://api.idolondemand.com/1/api/sync/extractconcepts/v1?text={0}&apikey=f0438796-6744-4ca2-9923-34605b45b713'.format(content))
+    test = "http://en.wikipedia.org/wiki/Mercedes-Benz";
+    r = requests.get('http://access.alchemyapi.com/calls/url/URLGetRankedKeywords?apikey=42918a4b1646af1e6e18c3048afced054c452dd4&url={0}&outputMode=json&maxRetrieve=20'.format(test))
     if not r.status_code == requests.codes.ok:
         return []
     z = r.json()
     keywords= []
-    for word in z['concepts'][:5]:
-        keywords.append(word['concept'])
+    for word in z['keywords']:
+        keywords.append(word['text'])
     return keywords
 
 @app.route('/get/locations/pushNotification/<latitude>/<longtitude>')
