@@ -82,7 +82,8 @@
     
     
     NSLog(@"Starting Background Server Loading Request…");
-    NSMutableURLRequest *request =[NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://192.168.1.50:5000/get/locations/pushNotification/%f/%f",newLocation.coordinate.latitude,newLocation.coordinate.longitude]]];
+//    NSMutableURLRequest *request =[NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://192.168.1.50:5000/get/locations/pushNotification/%f/%f",newLocation.coordinate.latitude,newLocation.coordinate.longitude]]];
+        NSMutableURLRequest *request =[NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://google.de/%f/%f",newLocation.coordinate.latitude,newLocation.coordinate.longitude]]];
     
     [request setHTTPMethod:@"GET"];
     
@@ -94,45 +95,49 @@
     NSError *err;
     NSData *responseData = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&err];
     
-    NSString *result =[[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding];
-    NSLog(result);
-    NSDictionary *dic = [NSJSONSerialization JSONObjectWithData:responseData options:0 error:nil];
+    //    NSString *result =[[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding];
     
-    
-    NSArray *institutionen = [dic objectForKey:@"notes"];
-    
-    NSMutableArray *institutions = [[NSMutableArray alloc] init];
-    if(institutionen && [institutionen count]>0) {
-        for(NSDictionary *institutionDic in institutionen) {
-            Institution *institution = [[Institution alloc] init];
-            double lat = [[[institutionDic objectForKey:@"gps"] objectForKey:@"lat"] doubleValue];
-            double lon = [[[institutionDic objectForKey:@"gps"] objectForKey:@"lon"] doubleValue];
-            
-            
-            
-            institution.name=[institutionDic objectForKey:@"name"];
-            institution.type=[institutionDic objectForKey:@"typ"];
-            institution.location=CLLocationCoordinate2DMake(lat, lon);
-            
-            [institutions addObject:institution];
-            
-        }
+    if(responseData) {
+        NSDictionary *dic = [NSJSONSerialization JSONObjectWithData:responseData options:0 error:nil];
         
-        if([institutions count]>0) {
-            Institution *pushInstitution = [institutions objectAtIndex:0];
+        
+        NSArray *institutionen = [dic objectForKey:@"notes"];
+        
+        NSMutableArray *institutions = [[NSMutableArray alloc] init];
+        if(institutionen && [institutionen count]>0) {
+            for(NSDictionary *institutionDic in institutionen) {
+                Institution *institution = [[Institution alloc] init];
+                double lat = [[[institutionDic objectForKey:@"gps"] objectForKey:@"lat"] doubleValue];
+                double lon = [[[institutionDic objectForKey:@"gps"] objectForKey:@"lon"] doubleValue];
+                
+                
+                
+                institution.name=[institutionDic objectForKey:@"name"];
+                institution.type=[institutionDic objectForKey:@"typ"];
+                institution.location=CLLocationCoordinate2DMake(lat, lon);
+                
+                [institutions addObject:institution];
+                
+            }
             
-            UILocalNotification *notification = [[UILocalNotification alloc] init];
-            notification.fireDate = [NSDate date];
-            notification.alertBody = [NSString stringWithFormat:@"%@ | %@",pushInstitution.name,pushInstitution.type];
-            notification.category=@"Boring";
-            notification.soundName=@"";
-            [[UIApplication sharedApplication] scheduleLocalNotification:notification];
-            NSLog(@"Push Notification Sent");
+            if([institutions count]>0) {
+                Institution *pushInstitution = [institutions objectAtIndex:0];
+                
+                UILocalNotification *notification = [[UILocalNotification alloc] init];
+                notification.fireDate = [NSDate date];
+                notification.alertBody = [NSString stringWithFormat:@"%@ | %@",pushInstitution.name,pushInstitution.type];
+                notification.category=@"Boring";
+                notification.soundName=@"";
+                [[UIApplication sharedApplication] scheduleLocalNotification:notification];
+                NSLog(@"Push Notification Sent");
+            } else {
+                NSLog(@"keine geeigneten Museen in der Nähe gefunden");
+            }
         } else {
             NSLog(@"keine geeigneten Museen in der Nähe gefunden");
         }
     } else {
-        NSLog(@"keine geeigneten Museen in der Nähe gefunden");
+        NSLog(@"Server nicht verfügbar.");
     }
 }
 

@@ -7,7 +7,11 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "UIImage+ImageEffects.h"
 
 @interface DetailViewController : UIViewController
+
+@property(nonatomic) UIImageView *institutionImage;
+@property(nonatomic) UIWebView *webView;
 
 @end
