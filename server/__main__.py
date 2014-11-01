@@ -5,7 +5,9 @@ from flask import Flask, jsonify, request
 import sql
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy_declarative import *
+import hashlib
 
 app = Flask(__name__)
 @app.route('/')
@@ -13,7 +15,7 @@ def hi():
     return "hey"
 
 class Wikipedia_Entry():
-    def __init__(self, name, gps, type, distance, schlagworte, pageid, imageurl, opening_hours):
+    def __init__(self, name, gps, type, distance, schlagworte, pageid, imageurl, opening_hours, address):
         self.name = name
         self.gps = gps
         self.type = type
@@ -22,6 +24,7 @@ class Wikipedia_Entry():
         self.pageid = pageid
         self.imageurl = imageurl
         self.opening_hours = opening_hours
+        self.address = address
 
     def toDict(self):
         dictionary = {
@@ -32,6 +35,7 @@ class Wikipedia_Entry():
             'pageid': self.pageid,
             'imageurl': self.imageurl,
             'opening_hours': self.opening_hours,
+            'address': self.address
         }
         return dictionary
 
@@ -117,12 +121,32 @@ def getImage(page_IDs):
             
             image = response.get('pages').get(page).get('thumbnail').get('source')
             if "logo" in image or ".svg" in image or "Logo" in image:
-                print("need another image")
-            print(image)
+                imagename = response.get('pages').get(page).get('pageimage').replace('_', ' ')
+                for name in getListofImagesForPage(page_IDs):
+                    if imagename in name.get('title'):
+                        continue
+                    image = calculateWikimediaFilePath(name.get('title'))
         return image
     except AttributeError:
         return None
 
+
+def calculateWikimediaFilePath(filename):
+    url = "http://upload.wikimedia.org/wikipedia/commons/"
+    filename = filename.replace(" ","_").split(':')[1]
+    m = hashlib.md5()
+    m.update(filename.encode('utf-8'))
+    md5sum = m.hexdigest()
+    return url+md5sum[:1]+"/"+md5sum[:2]+"/"+filename
+
+
+def getListofImagesForPage(page_IDs):
+    image_names = []
+    response= apicall('en', 'query', 'json', "&prop=imageinfo|images&inprop=url&pageids={0}".format(page_IDs)).get('query')
+    for page in response.get('pages'):
+        for image in response.get('pages').get(page).get('images'):
+            image_names.append(image)
+    return image_names
 
 def apicall(language, action, response_format, specialValues):
     url = "https://{0}.wikipedia.org/w/api.php?action={1}&format={2}{3}".format(language,action,response_format,specialValues)
@@ -175,6 +199,7 @@ def getLocations(latitude, longitude, **kwargs):
                 opening_hours = json.loads(article_datenbank.offnungszeiten)
                 types = article_datenbank.gattung
                 image = article_datenbank.picUrl
+                address = article_datenbank.address
                 keywords = []
                 for wort in article_datenbank.schlagworter:
                     keywords.append(wort.text)
@@ -201,40 +226,52 @@ def getLocations(latitude, longitude, **kwargs):
             googleResults = getPlacesAtLocation(latitude, longitude, radius, allowedtypes)
             types = googleResults.get('types')
             opening_hours = googleResults.get('opening_times'),
-
+            address = googleResults.get('address')
             # Wiki Api
             image = getImage([str(page_ID)])
             page = wikipedia.page(title, auto_suggest=True, redirect=False)
 
             # Alchemy Api
             keywords = getSchlagworter(page.title, page.url)
-            new_articel = Artikel(latitude= latitude, longitude=longitude, pageWikiId = page_ID, gattung = types, offnungszeiten = json.dumps(opening_hours), title = title, url = page.url, picUrl = image)
+            new_articel = Artikel(address= address, latitude= latitude, longitude=longitude, pageWikiId = page_ID, gattung = types, offnungszeiten = json.dumps(opening_hours), title = title, url = page.url, picUrl = image)
             for key in keywords:
                 k = Schlagwort(text = key)
                 session.add(k)
                 new_articel.schlagworter.append(k)            
 
             session.add(new_articel)
-            # session.commit()
+            #session.commit()
 
         entry = Wikipedia_Entry(title,
-                        {'lat': latitude,
-                         'lon': longitude},
-                        types,
-                        distance,
-                        keywords,
-                        page_ID,
-                        image,
-                        opening_hours
-                        )
+                                {'lat': latitude,
+                                 'lon': longitude},
+                                types,
+                                distance,
+                                keywords,
+                                page_ID,
+                                image,
+                                opening_hours,
+                                address
+                                )
 
         articles.append(entry.toDict())
     return jsonify({'notes': articles})
 
 @app.route('/get/details/<pageid>')
 def getDetails(pageid):
-    
-    return "Not read yet"
+    try:
+        artikel = session.query(Artikel).filter(Artikel.pageWikiId == pageid).one()
+        if artikel.summary:
+            summary = artikel.summary
+        else:
+            summary = wikipedia.summary(artikel.title)
+            artikel.summary = summary
+            session.add(artikel)
+            session.commit()
+    except NoResultFound:
+        return "Error", 404
+
+    return jsonify({'summary': summary})
 
 @app.route('/get/userID/')
 def getUserID():
