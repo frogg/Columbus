@@ -39,15 +39,23 @@ def apicall(language, action, response_format, listParams, specialValues):
     r = r.json().get('query').get('geosearch')
     return r
 
-def getSchlagworter(content):
+def getSchlagworter(title, url):
     test = "http://en.wikipedia.org/wiki/Mercedes-Benz";
-    r = requests.get('http://access.alchemyapi.com/calls/url/URLGetRankedKeywords?apikey=42918a4b1646af1e6e18c3048afced054c452dd4&url={0}&outputMode=json&maxRetrieve=20'.format(test))
+    r = requests.get('http://access.alchemyapi.com/calls/url/URLGetRankedKeywords?apikey=42918a4b1646af1e6e18c3048afced054c452dd4&url={0}&outputMode=json&maxRetrieve=10'.format(test))
     if not r.status_code == requests.codes.ok:
         return []
     z = r.json()
+    z = 0
     keywords= []
     for word in z['keywords']:
-        keywords.append(word['text'])
+        if z < 5
+            if title in word['text']:
+                print("It's there!!!")
+                z++
+            else:
+                keywords.append(word['text'])
+        else:
+            keywords.append(word['text'])
     return keywords
 
 @app.route('/get/locations/pushNotification/<latitude>/<longtitude>')
