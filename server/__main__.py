@@ -91,8 +91,8 @@ def getPlacesAtLocation(lattitude, longitude, radius, types):
     return result
 
 
-def geosearch(latitude, longtitude, gtype,radius): 
-    return apicall('en', 'query', 'json', "&type={0}&gsradius={3}&gscoord={1}|{2}&list=geosearch".format(gtype, latitude,longtitude,radius)).get('query').get('geosearch')
+def geosearch(latitude, longitude, gtype,radius): 
+    return apicall('en', 'query', 'json', "&type={0}&gsradius={3}&gscoord={1}|{2}&list=geosearch".format(gtype, latitude,longitude,radius)).get('query').get('geosearch')
 
 
 def getImage(page_IDs):
@@ -131,89 +131,38 @@ def getSchlagworter(title, url):
     return keywords[:5]
 
 
-@app.route('/get/articles/pushNotification/<latitude>/<longtitude>')
-def getPushLocations(latitude, longtitude):
+@app.route('/get/articles/<latitude>/<longitude>')
+def getLocations(latitude, longitude, **kwargs):
     articles = []
     radius = request.args.get('radius', 1000)
     userID = request.args.get('userID')
-    for article in geosearch(latitude, longtitude, 'landmark', radius):
-        if len(articles) > 5:
-            break
-        print(request.args)
-        title = article.get('title')
-        latitude = article.get('lat')
-        longtitude = article.get('lon')
-        distance = article.get('dist')
-        page_ID = article.get('pageid')
-
-
-        image = getImage([str(page_ID)])
-        # Google Places APi
-        allowedtypes = [
-            'museum',
-            'aquarium',
-            'art_gallery',
-            'book_store',
-            'cemetery',
-            'church'
-            'city_hall',
-            'hindu_temple',
-            'library',
-            'museum',
-            'place_of_worship',
-            'stadium',
-            'university',
-            'zoo']
-        googleResults = getPlacesAtLocation(latitude, longtitude, radius, allowedtypes)
-        types = googleResults.get('types')
-
-        #Wiki Api
-        page = wikipedia.page(title, auto_suggest=True, redirect=False)
-
-        #Alchemy Api
-        keywords = getSchlagworter(page.title, page.url)
-
-        entry = pushNotificationResponse(title,
-                                         {'lat': latitude,
-                                          'lon': longtitude},
-                                         types,
-                                         distance,
-                                         image,
-                                         keywords,
-                                         page_ID)
-
-        articles.append(entry.toDict())
-    return jsonify({'notes': articles}), 200
-
-
-@app.route('/get/articles/<latitude>/<longtitude>')
-def getLocations(latitude, longtitude, **kwargs):
-    articles = []
-    radius = request.args.get('radius', 1000)
-    userID = request.args.get('userID')
-    for article in geosearch(latitude, longtitude, 'landmark', radius):
+    databaseQueryAllArticels = session.query(Artikel).all()
+    for article in geosearch(latitude, longitude, 'landmark', radius):
         if len(articles) > 5:
             break
         title = article.get('title')
         latitude = article.get('lat')
-        longtitude = article.get('lon')
+        longitude = article.get('lon')
         distance = article.get('dist')
         page_ID = article.get('pageid')
         #url = TBD
 
         #check if article has been loaded already => lade article_datenbank
-        alreadyLoaded = false
-        for article_datenbank in session.query(Artikel).all():
+        alreadyLoaded = False
+        for article_datenbank in databaseQueryAllArticels:
             if article_datenbank.pageWikiId == page_ID:
-                alreadyLoaded = true;
-                opening_hours = jsonify({'opening_hours': article_datenbank.offnungszeiten})
-                gattung = article_datenbank.gattung
-                #open_now = TO BE CALCULATED FROM OPENING HOURS
+                alreadyLoaded = True;
+                opening_hours = "test"
+                types = article_datenbank.gattung
+                open_now = True # TO BE CALCULATED FROM OPENING HOURS
                 image = article_datenbank.picUrl
-                #keywords liste auslesen
+                keywords = []
+                for wort in article_datenbank.schlagworter:
+                    keywords.append(wort.text)
 
         #article isn#t stored already => load Data and save to DataBase
         if not alreadyLoaded:
+
              # Google Api
             allowedtypes = [
                 'museum',
@@ -230,21 +179,20 @@ def getLocations(latitude, longtitude, **kwargs):
                 'stadium',
                 'university',
                 'zoo']
-            googleResults = getPlacesAtLocation(latitude, longtitude, radius, allowedtypes)
-            #types = googleResults.get('types')
+            googleResults = getPlacesAtLocation(latitude, longitude, radius, allowedtypes)
+            types = googleResults.get('types')
             gattung = "MuseumTBD"
             opening_hours = googleResults.get('opening_times'),
             open_now = googleResults.get('opening_now')
 
             # Wiki Api
-            images = getImages(page_ID)
-            image = "TBD"
+            image = getImage([str(page_ID)])
             page = wikipedia.page(title, auto_suggest=True, redirect=False)
 
             # Alchemy Api
             keywords = getSchlagworter(page.title, page.url)
 
-            new_articel = Artikel(pageWikiId = page_ID, gattung = gattung, offnungszeiten = opening_hours, title = title, url = page, picUrl = image)
+            new_articel = Artikel(latitude= latitude, longitude=longitude, pageWikiId = page_ID, gattung = gattung, offnungszeiten = "test", title = title, url = page.url, picUrl = image)
             for key in keywords:
                 k = Schlagwort(text = key)
                 session.add(k)
@@ -253,38 +201,9 @@ def getLocations(latitude, longtitude, **kwargs):
             session.add(new_articel)
             session.commit()
 
-        # Google Api
-        allowedtypes = [
-            'museum',
-            'aquarium',
-            'art_gallery',
-            'book_store',
-            'cemetery',
-            'church'
-            'city_hall',
-            'hindu_temple',
-            'library',
-            'museum',
-            'place_of_worship',
-            'stadium',
-            'university',
-            'zoo']
-        googleResults = getPlacesAtLocation(latitude, longtitude, radius, allowedtypes)
-        types = googleResults.get('types')
-        opening_hours = googleResults.get('opening_times'),
-        open_now = googleResults.get('opening_now')
-
-        # Wiki Api
-        image = getImage([str(page_ID)])
-        page = wikipedia.page(title, auto_suggest=True, redirect=False)
-
-        # Alchemy Api
-        keywords = getSchlagworter(page.title, page.url)
-
-
         entry = Wikipedia_Entry(title,
                         {'lat': latitude,
-                         'lon': longtitude},
+                         'lon': longitude},
                         types,
                         distance,
                         keywords,
@@ -313,23 +232,23 @@ def getUserID():
 def setUserInfo(pageid, userID):
     liked=request.args.get('liked', True)
     user = session.query(User).filter(User.id == userID).one()
-    bereitsVorhanden = false
+    bereitsVorhanden = False
     for pArtikel in session.query(PersonalizedArtikel).filter(PersonalizedArtikel.user == user).all():
         if(pArtikel.artikel.pageWikiId == pageid):
-            bereitsVorhanden = true
+            bereitsVorhanden = True
             pArtikel.liked = False
 
-    if not bereitsVorhanden
-    article = session.query(Artikel).filter(Artikel.pageWikiId == pageid).one()
-    paritkel = PersonalizedArtikel(user=user, artikel=article, liked = liked, counter = 0)
-        session.add(paritkel)
-        session.commit()
+    if not bereitsVorhanden:
+        article = session.query(Artikel).filter(Artikel.pageWikiId == pageid).one()
+        paritkel = PersonalizedArtikel(user=user, artikel=article, liked = liked, counter = 0)
 
-    
+    session.add(paritkel)
+    session.commit()
+    return jsonify({'sucess': True})
 '''
-@app.route('/get/Info/<latitude>/<longtitude>')
-def pushLocations(latitude, longtitude):
-    return wikipedia.geosearch(latitude, longtitude)
+@app.route('/get/Info/<latitude>/<longitude>')
+def pushLocations(latitude, longitude):
+    return wikipedia.geosearch(latitude, longitude)
     return 'Hello World!'
 '''
 @app.errorhandler(404)
@@ -337,7 +256,14 @@ def page_not_found(error):
     return "Page not found", 404
 
 if __name__ == '__main__':
-    engine = create_engine('sqlite:///database.db')
+    mysqlhost = '127.0.0.1'
+    mysqlport = 3306
+    mysqluser = 'root'
+    mysqlpassword = 'asdf1234'
+    mysqldb = 'kolumbus'
+    engine = create_engine("mysql+pymysql://{0}:{1}@{2}/{3}"
+                       .format(mysqluser, mysqlpassword, mysqlhost, mysqldb),
+                       encoding='utf-8', echo=False)
     Base.metadata.create_all(engine)
     DBSession = sessionmaker(bind=engine)
     session = DBSession()

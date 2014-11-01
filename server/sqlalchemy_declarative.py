@@ -41,10 +41,10 @@ class Schlagwort(Base):
     id = Column(Integer, primary_key=True)
     slide_id = Column(Integer, ForeignKey('artikel.id'))
     position = Column(Integer)
-    text = Column(String)
+    text = Column(String(50))
 
     def __repr__(self):
-        return str(self.id)+self.text
+        return self.text
 
 
 class PersonalizedArtikel(Base):
