@@ -97,6 +97,7 @@
 
 -(void) setInstitution:(Institution *) _institution {
     institution=_institution;
+    institutionImage.image=nil;
     [wait startAnimating];
     
     void (^block)(UIImage *) = ^(UIImage *image) {

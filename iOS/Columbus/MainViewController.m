@@ -13,8 +13,11 @@
 @end
 
 @implementation MainViewController
-@synthesize institutionOverView;
-int aktuell=0;
+@synthesize institutionOverView,aktuell;
+
+
+
+
 - (void)viewDidLoad {
     [self.navigationController setNavigationBarHidden:YES animated:NO];
     [super viewDidLoad];
@@ -89,7 +92,7 @@ int aktuell=0;
 
 -(void) boring {
     aktuell++;
-    [institutionOverView setInstitution:[AktuellsteListe aktuelleListe][aktuell]];
+    [institutionOverView setInstitution:[AktuellsteListe aktuelleListe][aktuell%10]];
     
     
     
@@ -110,7 +113,7 @@ int aktuell=0;
 
 -(void) like {
     aktuell++;
-    [institutionOverView setInstitution:[AktuellsteListe aktuelleListe][aktuell]];
+    [institutionOverView setInstitution:[AktuellsteListe aktuelleListe][aktuell%10]];
     
     CATransition *animation = [CATransition animation];
     animation.type = @"rippleEffect";

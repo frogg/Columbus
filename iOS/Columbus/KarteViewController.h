@@ -11,6 +11,7 @@
 #import "MenuView.h"
 #import "SettingsViewController.h"
 #import "MainViewController.h"
+#import "AktuellsteListe.h"
 
 @interface KarteViewController : UIViewController <MenuDelegate>
 

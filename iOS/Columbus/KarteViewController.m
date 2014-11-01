@@ -65,6 +65,7 @@
 
 -(void) tips {
     MainViewController *tips = [[MainViewController alloc] init];
+    [tips newInstitution:[AktuellsteListe aktuelleListe][0]];
     [self.navigationController pushViewController:tips animated:YES];
 }
 

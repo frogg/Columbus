@@ -15,12 +15,13 @@ static Institution *lastPush;
 @implementation AppDelegate
 
 bool openedFromNotification;
-NSString *IP = @"192.168.1.89:4000";
-
+NSString *IP = @"192.168.1.83:4000";
+BOOL firststart;
 
 @synthesize locationManager,firstView;
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+    firststart=true;
     self.window = [[MBFingerTipWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     [self.window makeKeyAndVisible];
     
@@ -201,9 +202,15 @@ NSString *IP = @"192.168.1.89:4000";
 
 
 - (void)application:(UIApplication *)application didReceiveLocalNotification:(NSDictionary *)userInfo {
-    openedFromNotification=YES;
-    [firstView newInstitution:lastPush];
-    NSLog(@"YES");
+    
+    if ( application.applicationState == UIApplicationStateInactive || application.applicationState == UIApplicationStateBackground  || firststart)
+    {
+        openedFromNotification=YES;
+        [firstView newInstitution:lastPush];
+        NSLog(@"YES");
+        firststart=false;
+    }
+ 
 }
 
 

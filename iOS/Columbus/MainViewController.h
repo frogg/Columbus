@@ -19,6 +19,7 @@
 
 @property(nonatomic) InstitutionOverviewView *institutionOverView;
 @property(nonatomic) Institution *institution;
+@property(nonatomic) int aktuell;
 
 -(void) newInstitution:(Institution *) institutionneu;
 @end
