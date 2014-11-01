@@ -30,7 +30,7 @@ class Artikel(Base):
                             collection_class=ordering_list('position'),
                             order_by='Schlagwort.position')
     picUrl = Column(String(300))
-    offnungszeiten = Column(String(50))
+    offnungszeiten = Column(Text)
     url = Column(String(300))
     title = Column(String(50))
 

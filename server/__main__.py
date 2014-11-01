@@ -12,28 +12,8 @@ app = Flask(__name__)
 def hi():
     return "hey"
 
-class pushNotificationResponse():
-    def __init__(self, name, gps, typ, distance, image, schlagworte, pageid):
-        self.name = name
-        self.gps = gps
-        self.typ = typ
-        self.schlagworte = schlagworte
-        self.image = image
-        self.pageid = pageid
-
-    def toDict(self):
-        dictionary = {
-            'name': self.name,
-            'gps': self.gps,
-            'type': self.typ,
-            'imageurl': self.image,
-            'schlagworte': self.schlagworte,
-            'pageid': self.pageid
-        }
-        return dictionary
-
 class Wikipedia_Entry():
-    def __init__(self, name, gps, type, distance, schlagworte, pageid, imageurl, opening_hours, open_now):
+    def __init__(self, name, gps, type, distance, schlagworte, pageid, imageurl, opening_hours):
         self.name = name
         self.gps = gps
         self.type = type
@@ -42,7 +22,6 @@ class Wikipedia_Entry():
         self.pageid = pageid
         self.imageurl = imageurl
         self.opening_hours = opening_hours
-        self.open_now = open_now
 
     def toDict(self):
         dictionary = {
@@ -53,7 +32,6 @@ class Wikipedia_Entry():
             'pageid': self.pageid,
             'imageurl': self.imageurl,
             'opening_hours': self.opening_hours,
-            'open_now': self.open_now
         }
         return dictionary
 
@@ -136,7 +114,11 @@ def getImage(page_IDs):
     response= apicall('en', 'query', 'json', "&prop=pageimages&inprop=url&pageids={0}&pithumbsize=600".format(page_IDs)).get('query')
     try:
         for page in response.get('pages'):
-            image = response.get('pages').get(page).get('thumbnail').get('source')#
+            
+            image = response.get('pages').get(page).get('thumbnail').get('source')
+            if "logo" in image or ".svg" in image or "Logo" in image:
+                print("need another image")
+            print(image)
         return image
     except AttributeError:
         return None
@@ -190,9 +172,8 @@ def getLocations(latitude, longitude, **kwargs):
         for article_datenbank in databaseQueryAllArticels:
             if article_datenbank.pageWikiId == page_ID:
                 alreadyLoaded = True;
-                opening_hours = "test"
+                opening_hours = json.loads(article_datenbank.offnungszeiten)
                 types = article_datenbank.gattung
-                open_now = True # TO BE CALCULATED FROM OPENING HOURS
                 image = article_datenbank.picUrl
                 keywords = []
                 for wort in article_datenbank.schlagworter:
@@ -219,9 +200,7 @@ def getLocations(latitude, longitude, **kwargs):
                 'zoo']
             googleResults = getPlacesAtLocation(latitude, longitude, radius, allowedtypes)
             types = googleResults.get('types')
-            gattung = "MuseumTBD"
             opening_hours = googleResults.get('opening_times'),
-            open_now = googleResults.get('opening_now')
 
             # Wiki Api
             image = getImage([str(page_ID)])
@@ -229,15 +208,14 @@ def getLocations(latitude, longitude, **kwargs):
 
             # Alchemy Api
             keywords = getSchlagworter(page.title, page.url)
-
-            new_articel = Artikel(latitude= latitude, longitude=longitude, pageWikiId = page_ID, gattung = gattung, offnungszeiten = "test", title = title, url = page.url, picUrl = image)
+            new_articel = Artikel(latitude= latitude, longitude=longitude, pageWikiId = page_ID, gattung = types, offnungszeiten = json.dumps(opening_hours), title = title, url = page.url, picUrl = image)
             for key in keywords:
                 k = Schlagwort(text = key)
                 session.add(k)
                 new_articel.schlagworter.append(k)            
 
             session.add(new_articel)
-            session.commit()
+            # session.commit()
 
         entry = Wikipedia_Entry(title,
                         {'lat': latitude,
@@ -247,8 +225,7 @@ def getLocations(latitude, longitude, **kwargs):
                         keywords,
                         page_ID,
                         image,
-                        opening_hours,
-                        open_now
+                        opening_hours
                         )
 
         articles.append(entry.toDict())
