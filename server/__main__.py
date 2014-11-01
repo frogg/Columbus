@@ -204,7 +204,7 @@ def getLocations(latitude, longtitude, **kwargs):
                 gattung = article_datenbank.gattung
                 #open_now = TO BE CALCULATED FROM OPENING HOURS
                 image = article_datenbank.picUrl
-                #keywords liste
+                #keywords liste auslesen
 
         #article isn#t stored already => load Data and save to DataBase
         if not alreadyLoaded:
@@ -275,6 +275,23 @@ def getUserID():
     session.add(new_user)
     session.commit()
     return jsonify({'userID':new_user.id})
+
+@app.route('/post/user/profile/<pageid>/<userID>')
+def setUserInfo(pageid, userID):
+    liked=request.args.get('liked', True)
+    user = session.query(User).filter(User.id == userID).one()
+    bereitsVorhanden = false
+    for pArtikel in session.query(PersonalizedArtikel).filter(PersonalizedArtikel.user == user).all():
+        if(pArtikel.artikel.pageWikiId == pageid):
+            bereitsVorhanden = true
+            pArtikel.liked = False
+
+    if not bereitsVorhanden
+    article = session.query(Artikel).filter(Artikel.pageWikiId == pageid).one()
+    paritkel = PersonalizedArtikel(user=user, artikel=article, liked = liked, counter = 0)
+        session.add(paritkel)
+        session.commit()
+
     
 '''
 @app.route('/get/Info/<latitude>/<longtitude>')
