@@ -10,14 +10,14 @@
 
 @implementation AktuellsteListe
 
-static NSArray *liste;
+static NSMutableArray *liste;
 
 +(void) aktuelleListe:(NSArray *) neueListe {
-    liste=neueListe;
+    liste=[neueListe mutableCopy];
 }
 
 +(NSArray *) aktuelleListe {
-    return liste;
+    return [liste copy];
 }
 
 @end

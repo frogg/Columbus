@@ -13,18 +13,32 @@
 @end
 
 @implementation KarteViewController
-
+@synthesize mapView;
 - (void)viewDidLoad {
     [super viewDidLoad];
+   
+
     RMMapboxSource *onlineSource = [[RMMapboxSource alloc] initWithMapID:@"quappi.k416b1d9"];
-    
-    RMMapView *mapView = [[RMMapView alloc] initWithFrame:self.view.bounds andTilesource:onlineSource];
-    
+
+    mapView = [[RMMapView alloc] initWithFrame:self.view.bounds andTilesource:onlineSource];
+    mapView.delegate = self;
     mapView.zoom = 2;
     
-    mapView.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
-    
     [self.view addSubview:mapView];
+    
+    
+    for(Institution *i in [AktuellsteListe aktuelleListe]) {
+        RMPointAnnotation *annotation = [[RMPointAnnotation alloc] initWithMapView:mapView
+                                                                        coordinate:i.location
+                                                                          andTitle:i.name];
+        annotation.image = [UIImage imageNamed:@"location_brown.png"];
+        
+        [mapView addAnnotation:annotation];
+    }
+    [self zoomToFitAllAnnotationsAnimated:YES];
+
+    mapView.showsUserLocation=YES;
+
     
     
     UIButton *menu = [UIButton buttonWithType:UIButtonTypeCustom];
@@ -41,6 +55,73 @@
     [self setNeedsStatusBarAppearanceUpdate];
     // Do any additional setup after loading the view.
 }
+
+
+-(void)zoomToFitAllAnnotationsAnimated:(BOOL)animated {
+    
+    NSArray *annotations = mapView.annotations;
+    
+    if (annotations.count > 0) {
+        
+        CLLocationCoordinate2D firstCoordinate = [[annotations objectAtIndex:0]coordinate];
+        
+        //Find the southwest and northeast point
+        double northEastLatitude = firstCoordinate.latitude;
+        double northEastLongitude = firstCoordinate.longitude;
+        double southWestLatitude = firstCoordinate.latitude;
+        double southWestLongitude = firstCoordinate.longitude;
+        
+        for (RMAnnotation *annotation in annotations) {
+            CLLocationCoordinate2D coordinate = annotation.coordinate;
+            
+            northEastLatitude = MAX(northEastLatitude, coordinate.latitude);
+            northEastLongitude = MAX(northEastLongitude, coordinate.longitude);
+            southWestLatitude = MIN(southWestLatitude, coordinate.latitude);
+            southWestLongitude = MIN(southWestLongitude, coordinate.longitude);
+            
+            
+        }
+        //Define a margin so the corner annotations aren't flush to the edges
+        double margin = 0.005;
+        
+        [mapView zoomWithLatitudeLongitudeBoundsSouthWest:CLLocationCoordinate2DMake(southWestLatitude-margin, southWestLongitude-margin)
+                                             northEast:CLLocationCoordinate2DMake(northEastLatitude+margin, northEastLongitude+margin)
+                                              animated:animated];
+        
+    }
+    
+    
+}
+
+- (void)tapOnAnnotation:(RMAnnotation *)annotation onMap:(RMMapView *)map{
+    NSLog(@"testQuappi");
+    //AnnotationView *annotation = (AnnotationView *)mapView.annotation;
+    //NSInteger *yourIndex = annotation.myindex;
+}
+/*
+-(RMMapLayer *)mapView:(RMMapView *)mapView layerForAnnotation:(RMAnnotation *)annotation{
+    NSLog(@"1230");
+
+    if(annotation.isUserLocationAnnotation)
+       return nil;
+    NSLog(@"tsetssfs");
+    RMMarker *marker=[[RMMarker alloc] init];
+    [marker setFrame:CGRectMake(0, 0, 126, 91)];
+    marker.rightCalloutAccessoryView = [UIButton buttonWithType:UIButtonTypeDetailDisclosure];
+
+    
+    return marker;
+    
+}
+ */
+
+- (void)tapOnCalloutAccessoryControl:(UIControl *)control forAnnotation:(RMAnnotation *)annotation onMap:(RMMapView *)map
+{
+    NSLog(@"You tapped the callout button!");
+}
+
+
+
 
 -(void) menu {
     MenuView *menu = [[MenuView alloc] initWithFrame:self.view.frame];

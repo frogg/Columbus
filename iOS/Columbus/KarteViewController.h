@@ -13,7 +13,7 @@
 #import "MainViewController.h"
 #import "AktuellsteListe.h"
 
-@interface KarteViewController : UIViewController <MenuDelegate>
-
+@interface KarteViewController : UIViewController <MenuDelegate, RMMapViewDelegate>
+@property(nonatomic)RMMapView *mapView;
 
 @end

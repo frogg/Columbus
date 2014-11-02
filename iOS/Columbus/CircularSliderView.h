@@ -8,6 +8,13 @@
 
 #import <UIKit/UIKit.h>
 
+@protocol CircularSliderDelegate <NSObject>
+@required
+-(void) newOutputString:(NSString *) string forType:(int) type;
+
+
+@end
+
 @interface CircularSliderView : UIView
 
 @property(nonatomic) CGPoint barCenter, knobCenter;
@@ -15,7 +22,7 @@
 @property(nonatomic) bool isKnobBeingTouched;
 @property(nonatomic) UILabel* valueLabel;
 @property(nonatomic) int type;
-
+@property(nonatomic,weak)id<CircularSliderDelegate> delegate;
 
 -(id)initWithMinValue:(float)minimumValue maxValue:(float)maximumValue initialValue:(float)initialValue withType:(int) type;
 -(float)value;

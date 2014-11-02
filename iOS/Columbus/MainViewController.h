@@ -14,12 +14,17 @@
 #import "KarteViewController.h"
 #import "Institution.h"
 #import "AktuellsteListe.h"
+#import "IP.h"
+#import "LocalDataBase.h"
+
+@import QuartzCore;
 
 @interface MainViewController : UIViewController <InstitutionOverViewDelegate,MenuDelegate>
 
 @property(nonatomic) InstitutionOverviewView *institutionOverView;
 @property(nonatomic) Institution *institution;
 @property(nonatomic) int aktuell;
+@property(nonatomic) UIImageView *startimage;
 
 -(void) newInstitution:(Institution *) institutionneu;
 @end

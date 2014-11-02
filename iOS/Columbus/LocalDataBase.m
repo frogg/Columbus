@@ -14,6 +14,35 @@ NSString *uuid;
 NSString *meter;
 NSString *timeDiff;
 
++(void) checkIfUserIsAlreadyRegistered {
+    NSString* documentsPath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
+    
+    NSString* foofile = [documentsPath stringByAppendingPathComponent:@"uuid.txt"];
+    BOOL fileExists = [[NSFileManager defaultManager] fileExistsAtPath:foofile];
+    if(!fileExists) {
+        NSMutableURLRequest *request =[NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://%@/get/userID/",[IP getIP]]]];
+        //    NSMutableURLRequest *request =[NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://google.de/%f/%f",newLocation.coordinate.latitude,newLocation.coordinate.longitude]]];
+        
+        [request setHTTPMethod:@"GET"];
+        
+        NSString *post = nil;
+        NSData *postData = [post dataUsingEncoding:NSASCIIStringEncoding allowLossyConversion:YES];
+        [request setHTTPBody:postData];
+        
+        NSURLResponse *response;
+        NSError *err;
+        NSData *responseData = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&err];
+        NSString *result =[[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding];
+        if(![result isEqualToString:@""] && result!=(NSString *) [NSNull null] && result) {
+            NSDictionary *dic = [NSJSONSerialization JSONObjectWithData:responseData options:0 error:nil];
+            meter=@"250";
+            timeDiff=@"10";
+            [self setUUID:[NSString stringWithFormat:@"%ld",(long)[[dic objectForKey:@"userID"] integerValue]]];
+        }
+    } else {
+        [self getFromFile];
+    }
+}
 
 +(void) setMeter:(NSString *)string {
     meter=string;
@@ -21,7 +50,7 @@ NSString *timeDiff;
 }
 
 +(NSString *) meter {
-    if([meter isEqualToString:@""]) {
+    if([meter isEqualToString:@""] || meter==[NSNull null] || meter == NULL || !meter) {
         [self getFromFile];
         if([meter isEqualToString:@""]) {
             meter=@"250";
@@ -36,12 +65,14 @@ NSString *timeDiff;
 }
 
 +(NSString *) time {
-    if([timeDiff isEqualToString:@""]) {
+
+    if([timeDiff isEqualToString:@""] || timeDiff==[NSNull null] || timeDiff==NULL || !timeDiff) {
         [self getFromFile];
         if([timeDiff isEqualToString:@""]) {
             timeDiff=@"60";
         }
     }
+    NSLog(@"---%@",timeDiff);
     return timeDiff;
 }
 
@@ -52,10 +83,10 @@ NSString *timeDiff;
 }
 
 +(NSString *) UUID {
-    if([uuid isEqualToString:@""]) {
+    if([uuid isEqualToString:@""] || !uuid) {
         [self getFromFile];
-        //ggf neue beantragen
     }
+    NSLog(uuid);
     return uuid;
 }
 
@@ -63,7 +94,9 @@ NSString *timeDiff;
 +(void) saveString {
     NSString *string = [NSString stringWithFormat:@"%@\n%@\n%@",uuid,meter,timeDiff];
     NSString* documentsPath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
+    
     NSString *path = [documentsPath stringByAppendingPathComponent:@"uuid.txt"];
+    NSLog(path);
     [string writeToFile:path atomically:YES encoding:NSUTF8StringEncoding error:nil];
 }
 
