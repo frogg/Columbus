@@ -12,6 +12,8 @@
 #import "SettingsViewController.h"
 #import "MainViewController.h"
 #import "AktuellsteListe.h"
+#import "RMConfiguration.h"
+#import "RMMarker.h"
 
 @interface KarteViewController : UIViewController <MenuDelegate, RMMapViewDelegate>
 @property(nonatomic)RMMapView *mapView;
