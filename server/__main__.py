@@ -64,7 +64,7 @@ def getLocations(latitude, longitude, **kwargs):
         return Response("Nothing found, but we are never gona give you up, let you down ....", 404).response()
     session = DBSession()
     articles = []
-    wikiCategorieBlacklist = ['adm2nd', 'adm1st', 'adm3nd', 'river', 'forest']
+    wikiCategorieBlacklist = ['adm2nd', 'adm1st', 'adm3nd', 'river', 'forest', 'city']
     for article in geosearch(latitude, longitude, 'landmark', radius):
         if article.get('type') in wikiCategorieBlacklist:
             continue
