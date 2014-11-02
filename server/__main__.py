@@ -20,7 +20,7 @@ from sqlalchemy_declarative import (Base,
 from util import *
 from error_handler import error_handler
 from Wikipedia_Entry import Wikipedia_Entry
-
+from Response import Response
 
 app = Flask(__name__)
 
@@ -61,7 +61,7 @@ def getLocations(latitude, longitude, **kwargs):
         latitude = float(latitude)
         longitude = float(longitude)
     except ValueError:
-        return "nope", 404
+        return Response("Nothing found, but we are never gona give you up, let you down ....", 404).response()
     session = DBSession()
     articles = []
     wikiCategorieBlacklist = ['adm2nd', 'adm1st', 'adm3nd', 'river', 'forest']
@@ -82,7 +82,7 @@ def getLocations(latitude, longitude, **kwargs):
                                                 longitude,
                                                 70)
             types = googleResults.get('types')
-            opening_hours = googleResults.get('opening_times'),
+            opening_hours = googleResults['opening_times']
             address = googleResults.get('address')
             # Wiki Api
             image = getImage([str(page_ID)])
@@ -126,7 +126,7 @@ def getLocations(latitude, longitude, **kwargs):
                           key=lambda article: calculateLikes(article.get('type'),
                                                              userID, session,
                                                              article.get('distance')))
-    return jsonify({'notes': articles})
+    return Response({'notes': articles}, 200).response()
 
 
 @app.route('/get/details/<pageid>', methods=['GET'])
@@ -150,9 +150,9 @@ def getDetails(pageid):
             session.add(artikel)
             session.commit()
     except NoResultFound:
-        return "Error", 404
+        return Response(None, 404).response()
     session.close()
-    return jsonify({'summary': summary})
+    return Response({'summary': summary}, 200).response()
 
 
 @app.route('/get/userID/', methods=['GET'])
@@ -163,7 +163,7 @@ def getUserID():
     session.commit()
     userid = new_user.id
     session.close()
-    return jsonify({'userID': userid})
+    return Response({'userID': userid}, 200).response()
 
 
 @app.route('/post/user/profile/<pageid>/<userID>', methods=['POST'])
@@ -171,10 +171,10 @@ def setUserInfo(pageid, userID):
     try:
         userID = int(userID)
         pageid = int(pageid)
-        
+
         time = int(request.args.get('time', 0))
     except ValueError:
-        return "You Sir, fucked up", 400
+        return Response("You Sir, fucked up", 400).response()
     session = DBSession()
     liked = request.args.get('liked', True)
     if liked == "true":
@@ -226,15 +226,15 @@ def setUserInfo(pageid, userID):
         session.commit()
     except NoResultFound:
         session.close()
-        return "Unkown User ID", 404
+        return Response("You will remember the day where you almost passed a valid User ID/Wiki ID", 404).response()
 
     session.close()
-    return jsonify({'sucess': True})
+    return Response({'response': "well, this works"}, 200).response()
 
 
 @app.errorhandler(404)
 def page_not_found(error):
-    return "Page not found", 404
+    return Response("You shall not find what you are looking for", 404).response()
 
 if __name__ == '__main__':
     mysqlhost = '127.0.0.1'
