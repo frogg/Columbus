@@ -16,10 +16,12 @@
 @synthesize mapView;
 - (void)viewDidLoad {
     [super viewDidLoad];
+   
+
     RMMapboxSource *onlineSource = [[RMMapboxSource alloc] initWithMapID:@"quappi.k416b1d9"];
-    
+
     mapView = [[RMMapView alloc] initWithFrame:self.view.bounds andTilesource:onlineSource];
-    
+    mapView.delegate = self;
     mapView.zoom = 2;
     
     [self.view addSubview:mapView];
@@ -29,6 +31,7 @@
         RMPointAnnotation *annotation = [[RMPointAnnotation alloc] initWithMapView:mapView
                                                                         coordinate:i.location
                                                                           andTitle:i.name];
+        annotation.image = [UIImage imageNamed:@"location_brown.png"];
         
         [mapView addAnnotation:annotation];
     }
@@ -89,6 +92,34 @@
     
     
 }
+
+- (void)tapOnAnnotation:(RMAnnotation *)annotation onMap:(RMMapView *)map{
+    NSLog(@"testQuappi");
+    //AnnotationView *annotation = (AnnotationView *)mapView.annotation;
+    //NSInteger *yourIndex = annotation.myindex;
+}
+/*
+-(RMMapLayer *)mapView:(RMMapView *)mapView layerForAnnotation:(RMAnnotation *)annotation{
+    NSLog(@"1230");
+
+    if(annotation.isUserLocationAnnotation)
+       return nil;
+    NSLog(@"tsetssfs");
+    RMMarker *marker=[[RMMarker alloc] init];
+    [marker setFrame:CGRectMake(0, 0, 126, 91)];
+    marker.rightCalloutAccessoryView = [UIButton buttonWithType:UIButtonTypeDetailDisclosure];
+
+    
+    return marker;
+    
+}
+ */
+
+- (void)tapOnCalloutAccessoryControl:(UIControl *)control forAnnotation:(RMAnnotation *)annotation onMap:(RMMapView *)map
+{
+    NSLog(@"You tapped the callout button!");
+}
+
 
 
 
