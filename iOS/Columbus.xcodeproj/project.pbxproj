@@ -400,7 +400,7 @@
 				TargetAttributes = {
 					51C053271A03FC8000A1C15C = {
 						CreatedOnToolsVersion = 6.1;
-						DevelopmentTeam = 926UGDBTEC;
+						DevelopmentTeam = 52U6XAJSSF;
 						SystemCapabilities = {
 							com.apple.BackgroundModes = {
 								enabled = 1;
@@ -409,7 +409,7 @@
 					};
 					51C053401A03FC8000A1C15C = {
 						CreatedOnToolsVersion = 6.1;
-						DevelopmentTeam = 926UGDBTEC;
+						DevelopmentTeam = 52U6XAJSSF;
 						TestTargetID = 51C053271A03FC8000A1C15C;
 					};
 				};

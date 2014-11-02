@@ -31,7 +31,7 @@
         
         UIButton *back = [UIButton buttonWithType:UIButtonTypeCustom];
         [back addTarget:self action:@selector(back) forControlEvents:UIControlEventTouchUpInside];
-        [back setImage:[UIImage imageNamed:@"back_light.png"] forState:UIControlStateNormal];
+        [back setImage:[UIImage imageNamed:@"back_dark.png"] forState:UIControlStateNormal];
         back.frame=CGRectMake(15, 35, 24, 24);
         [self addSubview:back];
         

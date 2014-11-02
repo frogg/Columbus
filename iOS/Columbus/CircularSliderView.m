@@ -141,8 +141,12 @@
     
     //draw the knob
     CGContextSetLineWidth(context, 2.0);
+    
     CGContextSetFillColorWithColor(context, [UIColor greenColor].CGColor);
+    
     CGContextAddArc(context, knobCenter.x, knobCenter.y, knobRadius, 0, 2*M_PI, 1);
+    
+    
     /*
      //draw gradient in the knob
      CGContextClip(context);

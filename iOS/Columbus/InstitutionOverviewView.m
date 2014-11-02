@@ -62,7 +62,7 @@
     UIButton *details = [UIButton buttonWithType:UIButtonTypeCustom];
     [details addTarget:self action:@selector(details) forControlEvents:UIControlEventTouchUpInside];
     [details setImage:[UIImage imageNamed:@"details.png"] forState:UIControlStateNormal];
-    details.frame=CGRectMake(140, 550, 100, 25);
+    details.frame=CGRectMake(140, 540, 100, 25);
     [self addSubview:details];
 
     UIButton *boring = [UIButton buttonWithType:UIButtonTypeCustom];
@@ -80,7 +80,7 @@
     UIButton *imageDetails = [UIButton buttonWithType:UIButtonTypeCustom];
     [imageDetails addTarget:self action:@selector(details) forControlEvents:UIControlEventTouchUpInside];
 
-    imageDetails.frame=CGRectMake(0, 0, self.frame.size.width, 400);
+    imageDetails.frame=CGRectMake(0, 0, self.frame.size.width, 300);
     [self addSubview:imageDetails];
     
     

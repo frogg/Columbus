@@ -30,13 +30,7 @@
         institutionImage.clipsToBounds=YES;
         void (^block)(UIImage *) = ^(UIImage *image) {
             [self performSelectorInBackground:@selector(blurImageInBackground:) withObject:image];
-            if(!image) {
-                UIButton *back = [UIButton buttonWithType:UIButtonTypeCustom];
-                [back addTarget:self action:@selector(back) forControlEvents:UIControlEventTouchUpInside];
-                [back setImage:[UIImage imageNamed:@"back_dark.png"] forState:UIControlStateNormal];
-                back.frame=CGRectMake(15, 35, 24, 24);
-                [self.view addSubview:back];
-            }
+            
         };
         
         [institution performSelectorInBackground:@selector(imageUsingBlock:) withObject:block];
@@ -66,33 +60,45 @@
         [institution performSelectorInBackground:@selector(descriptionUsingBlock:) withObject:blocki];
         
         
-        
-        UIButton *back = [UIButton buttonWithType:UIButtonTypeCustom];
-        [back addTarget:self action:@selector(back) forControlEvents:UIControlEventTouchUpInside];
-        [back setImage:[UIImage imageNamed:@"back_light.png"] forState:UIControlStateNormal];
-        back.frame=CGRectMake(15, 35, 24, 24);
-        [self.view addSubview:back];
+
         
 
         UIButton *google = [UIButton buttonWithType:UIButtonTypeCustom];
         [google addTarget:self action:@selector(route) forControlEvents:UIControlEventTouchUpInside];
         [google setImage:[UIImage imageNamed:@"btn_google_maps.png"] forState:UIControlStateNormal];
-        google.frame=CGRectMake(0, self.view.frame.size.height-53, self.view.frame.size.width/3, 53);
+        google.frame=CGRectMake(0, self.view.frame.size.height-53, self.view.frame.size.width/3-1, 53);
         [self.view addSubview:google];
         
         UIButton *favorize = [UIButton buttonWithType:UIButtonTypeCustom];
-        [favorize addTarget:self action:@selector(back) forControlEvents:UIControlEventTouchUpInside];
+        [favorize addTarget:self action:@selector(fav) forControlEvents:UIControlEventTouchUpInside];
         [favorize setImage:[UIImage imageNamed:@"btn_heart.png"] forState:UIControlStateNormal];
-        favorize.frame=CGRectMake(self.view.frame.size.width/3, self.view.frame.size.height-53, self.view.frame.size.width/3, 53);
+        favorize.frame=CGRectMake(self.view.frame.size.width/3+1, self.view.frame.size.height-53, self.view.frame.size.width/3-1, 53);
         [self.view addSubview:favorize];
         
         UIButton *map = [UIButton buttonWithType:UIButtonTypeCustom];
-        [map addTarget:self action:@selector(back) forControlEvents:UIControlEventTouchUpInside];
+        [map addTarget:self action:@selector(fav) forControlEvents:UIControlEventTouchUpInside];
         [map setImage:[UIImage imageNamed:@"btn_karte.png"] forState:UIControlStateNormal];
-        map.frame=CGRectMake(2*(self.view.frame.size.width/3), self.view.frame.size.height-53, self.view.frame.size.width/3, 53);
+        map.frame=CGRectMake(2*(self.view.frame.size.width/3)+2, self.view.frame.size.height-53, self.view.frame.size.width/3, 53);
         [self.view addSubview:map];
         
-
+        UIButton *menu = [UIButton buttonWithType:UIButtonTypeCustom];
+        [menu addTarget:self action:@selector(back) forControlEvents:UIControlEventTouchUpInside];
+        [menu setImage:[UIImage imageNamed:@"menu_light.png"] forState:UIControlStateNormal];
+        menu.frame=CGRectMake(0, 35, 24+15, 24+15);
+        [self.view addSubview:menu];
+        
+        
+        UIButton *back = [UIButton buttonWithType:UIButtonTypeCustom];
+        [back addTarget:self action:@selector(back) forControlEvents:UIControlEventTouchUpInside];
+        [back setImage:[UIImage imageNamed:@"back_light.png"] forState:UIControlStateNormal];
+        back.frame=CGRectMake(0, 35+25+10, 24+15, 24+15);
+        [self.view addSubview:back];
+        
+        UIButton *settings = [UIButton buttonWithType:UIButtonTypeCustom];
+        [settings addTarget:self action:@selector(back) forControlEvents:UIControlEventTouchUpInside];
+        [settings setImage:[UIImage imageNamed:@"settings_light.png"] forState:UIControlStateNormal];
+        settings.frame=CGRectMake(self.view.frame.size.width-24-30, 35-15, 24+30, 24+15);
+        [self.view addSubview:settings];
         
         
         
@@ -142,13 +148,13 @@
 }
 
 -(void) blurImageInBackground:(UIImage *) image {
-    image = [image applyBlurWithRadius:10 tintColor:[UIColor colorWithRed:0 green:0 blue:0 alpha:0.6] saturationDeltaFactor:1.0 maskImage:nil];
+    image = [image applyBlurWithRadius:10 tintColor:[UIColor colorWithRed:79.0/255 green:74.0/255 blue:69.0/255 alpha:0.7] saturationDeltaFactor:0.0 maskImage:nil];
     [institutionImage performSelectorOnMainThread:@selector(setImage:) withObject:image waitUntilDone:NO];
 }
 
 -(NSString *) getHTMlString {
     
-    return [NSString stringWithFormat:@"<html><head><style type=\"text/css\">a{color: #BD997C;}  tit {	font-size: 27;    font-family: HelveticaNeue-Medium;    color: #BD997C;} sub {	font-size: 17;    font-family: HelveticaNeue-light;    color: #BD997C;}  txt {	font-size: 17;    font-family: HelveticaNeue-light;    color: #000000;}    </style></head><center><tit>%@</tit><br><sub>%@</sub><br><br><br><br></center><txt>%@<br><br><a href='%@'><i>Read more on  Wikipedia.</i></a><br><br><br>%@</txt></br></html>",self.institution.name,self.institution.type,self.institution.beschreibung,self.institution.url,[self.institution getOpeningHours]];
+    return [NSString stringWithFormat:@"<html><head><style type=\"text/css\">a{color: #BD997C;}  tit {	font-size: 27;    font-family: HelveticaNeue-Medium;    color: #FFFFFF;} sub {	font-size: 17;    font-family: HelveticaNeue-light;    color: #FFFFFF;}  txt {	font-size: 15;    font-family: HelveticaNeue-light;    color: #888078;}    </style></head><center><tit>%@</tit><br><sub>%@</sub><br><br><br></center><table cellspacing=\"20\"><tr><td><txt>%@<br><br><a href='%@'><i>Read more on  Wikipedia.</i></a><br><br><br>%@</txt></td></tr></table></br></html>",self.institution.name,self.institution.type,self.institution.beschreibung,self.institution.url,[self.institution getOpeningHours]];
     #warning HIER IST NOCH EIN HARD CODE (DIE ÖFFNUNGSZEITEN)
 }
 
@@ -159,7 +165,11 @@
 -(void) route {
 
     [[UIApplication sharedApplication] openURL:
-     [NSURL URLWithString:[NSString stringWithFormat:@"comgooglemaps://?daddr=%f,%f",self.institution.location.latitude,self.institution.location.longitude]]];
+     [NSURL URLWithString:[NSString stringWithFormat:@"comgooglemaps://?daddr=%f,%f?saddr=?directionsmode=walking",self.institution.location.latitude,self.institution.location.longitude]]];
+}
+
+-(void) fav {
+    
 }
 
 /*

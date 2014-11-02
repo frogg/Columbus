@@ -38,7 +38,7 @@
     radiusDetail.textColor=[UIColor whiteColor];
     radiusDetail.textAlignment=NSTextAlignmentCenter;
     
-    UIImageView *trenner = [[UIImageView alloc] initWithFrame:CGRectMake(0, 335, self.view.frame.size.width, 20)];
+    UIImageView *trenner = [[UIImageView alloc] initWithFrame:CGRectMake(60, 335, self.view.frame.size.width-120, 20)];
     trenner.image=[UIImage imageNamed:@"settings_trenner.png"];
     trenner.contentMode=UIViewContentModeScaleAspectFit;
     [self.view addSubview:trenner];
@@ -55,7 +55,7 @@
 
     UILabel *frequenz = [[UILabel alloc] initWithFrame:CGRectMake(0, 330+230, self.view.frame.size.width, 44)];
     frequenz.font=[UIFont fontWithName:@"Helveticaneue-ultralight" size:35];
-    frequenz.text=@"Frequenz";
+    frequenz.text=@"Frequency";
     frequenz.textColor=[UIColor whiteColor];
     frequenz.textAlignment=NSTextAlignmentCenter;
     [self.view addSubview:frequenz];
