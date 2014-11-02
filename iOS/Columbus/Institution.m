@@ -47,11 +47,28 @@
 }
 
 -(NSString*) getOpeningHours{
-    for(NSArray *arr in self.openingHours){
-     //   = [value objectForKey:@"user"];
+    @try {
+        if(self.openingHours!=(NSDictionary*)[NSNull null]){
+       //     for( in self.openingHours){
+                
+        //    }
+            
+            NSArray *arr = [self.openingHours objectForKey:@"fri"];
+            
+            /*  for(NSArray *arr in self.openingHours){
+             //   = [value objectForKey:@"user"];
+             }
+             */
+        }
+
     }
-   // self.openingHours
-    return @"Opening Hours";
+    @catch (NSException *exception) {
+
+    }
+    @finally {
+    return @"10:00-18:00";
+    }
+
 }
 
 

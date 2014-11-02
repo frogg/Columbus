@@ -27,5 +27,6 @@
 
 -(void) imageUsingBlock:(void (^)(UIImage *image))block;
 -(void) descriptionUsingBlock:(void (^)(NSString *beschriebung))block;
+-(NSString*) getOpeningHours;
 
 @end

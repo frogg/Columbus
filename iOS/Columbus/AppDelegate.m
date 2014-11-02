@@ -140,7 +140,8 @@ BOOL firststart;
                         
                         institution.uuid=[institutionDic objectForKey:@"pageid"];
                         institution.openingHours=[institutionDic objectForKey:@"opening_hours"];
-                        
+                        NSLog(institution.openingHours.description);
+                        [institution getOpeningHours];
                        
                         NSLog(@"%@",institution.uuid);
                         

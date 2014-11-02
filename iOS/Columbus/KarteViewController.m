@@ -98,7 +98,7 @@
     //AnnotationView *annotation = (AnnotationView *)mapView.annotation;
     //NSInteger *yourIndex = annotation.myindex;
 }
-/*
+
 -(RMMapLayer *)mapView:(RMMapView *)mapView layerForAnnotation:(RMAnnotation *)annotation{
     NSLog(@"1230");
 
@@ -106,6 +106,8 @@
        return nil;
     NSLog(@"tsetssfs");
     RMMarker *marker=[[RMMarker alloc] init];
+    [marker changeLabelUsingText:@"test"];
+
     [marker setFrame:CGRectMake(0, 0, 126, 91)];
     marker.rightCalloutAccessoryView = [UIButton buttonWithType:UIButtonTypeDetailDisclosure];
 
@@ -113,7 +115,7 @@
     return marker;
     
 }
- */
+
 
 - (void)tapOnCalloutAccessoryControl:(UIControl *)control forAnnotation:(RMAnnotation *)annotation onMap:(RMMapView *)map
 {
