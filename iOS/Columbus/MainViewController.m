@@ -149,6 +149,7 @@
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         // do your background tasks here
         NSMutableURLRequest *request =[NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://%@/post/user/profile/%@/%@?liked=true&time=2010",[IP getIP],i.uuid,[LocalDataBase UUID]]]];
+        #warning HIER IST NOCH EIN HARD CODE (DIE ZEIT DIE ICH ES ANSCHAUE IN MILISEKUNDEN 2010)
         //    NSMutableURLRequest *request =[NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://google.de/%f/%f",newLocation.coordinate.latitude,newLocation.coordinate.longitude]]];
         
         [request setHTTPMethod:@"POST"];

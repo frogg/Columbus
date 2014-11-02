@@ -33,7 +33,7 @@ NSString *timeDiff;
         NSError *err;
         NSData *responseData = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&err];
         NSString *result =[[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding];
-        if(![result isEqualToString:@""]) {
+        if(![result isEqualToString:@""] && result!=(NSString *) [NSNull null] && result) {
             NSDictionary *dic = [NSJSONSerialization JSONObjectWithData:responseData options:0 error:nil];
             [self setUUID:[NSString stringWithFormat:@"%ld",(long)[[dic objectForKey:@"userID"] integerValue]]];
         }
@@ -46,7 +46,7 @@ NSString *timeDiff;
 }
 
 +(NSString *) meter {
-    if([meter isEqualToString:@""] || meter==[NSNull null] || meter == NULL) {
+    if([meter isEqualToString:@""] || meter==[NSNull null] || meter == NULL || !meter) {
         [self getFromFile];
         if([meter isEqualToString:@""]) {
             meter=@"250";
@@ -62,7 +62,7 @@ NSString *timeDiff;
 
 +(NSString *) time {
 
-    if([timeDiff isEqualToString:@""] || timeDiff==[NSNull null] || timeDiff==NULL) {
+    if([timeDiff isEqualToString:@""] || timeDiff==[NSNull null] || timeDiff==NULL || !timeDiff) {
         [self getFromFile];
         if([timeDiff isEqualToString:@""]) {
             timeDiff=@"60";
@@ -90,7 +90,9 @@ NSString *timeDiff;
 +(void) saveString {
     NSString *string = [NSString stringWithFormat:@"%@\n%@\n%@",uuid,meter,timeDiff];
     NSString* documentsPath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
+    
     NSString *path = [documentsPath stringByAppendingPathComponent:@"uuid.txt"];
+    NSLog(path);
     [string writeToFile:path atomically:YES encoding:NSUTF8StringEncoding error:nil];
 }
 

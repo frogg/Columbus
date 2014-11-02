@@ -13,11 +13,11 @@
 @end
 
 @implementation SettingsViewController
-@synthesize frequenzDetail,radiusDetail;
+@synthesize frequenzDetail,radiusDetail,sliderView,maxdistance;
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.view.backgroundColor=[UIColor darkGrayColor];
-    CircularSliderView *maxdistance = [[CircularSliderView alloc] initWithMinValue:100 maxValue:2000 initialValue:[[LocalDataBase meter] intValue] withType:0];
+    maxdistance = [[CircularSliderView alloc] initWithMinValue:100 maxValue:2000 initialValue:[[LocalDataBase meter] intValue] withType:0];
     maxdistance.frame=CGRectMake(0, 20, self.view.frame.size.width, 200);
     maxdistance.clipsToBounds=NO;
     [self.view addSubview:maxdistance];
@@ -43,7 +43,7 @@
     trenner.contentMode=UIViewContentModeScaleAspectFit;
     [self.view addSubview:trenner];
     
-    CircularSliderView *sliderView = [[CircularSliderView alloc] initWithMinValue:10 maxValue:180 initialValue:[[LocalDataBase time] intValue] withType:1];
+    sliderView = [[CircularSliderView alloc] initWithMinValue:10 maxValue:180 initialValue:[[LocalDataBase time] intValue] withType:1];
     sliderView.frame=CGRectMake(0, 370, self.view.frame.size.width, 200);
     sliderView.clipsToBounds=NO;
 
@@ -92,6 +92,8 @@
 }
 
 -(void) back {
+    [LocalDataBase setMeter:[NSString stringWithFormat:@"%.0f",maxdistance.value]];
+    [LocalDataBase setTime:[NSString stringWithFormat:@"%.0f",sliderView.value]];
     [self.navigationController popViewControllerAnimated:YES];
 }
 
