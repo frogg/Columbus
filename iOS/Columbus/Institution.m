@@ -101,6 +101,7 @@
         NSString* toReturn = @"";
         for(int i=0; i<[weekdays count]; i++){
             if(![[weekdays objectAtIndex:i] isEqualToString:[weekdaysUnChanged objectAtIndex:i]]){
+
                 if(i==wochentagIndex){
                     toReturn = [NSString stringWithFormat:@"%@<b>%@</b><br>",toReturn,[weekdays objectAtIndex:i]] ;
                 }else{
@@ -116,9 +117,7 @@
 
             }
         }
-        
 
-        
         return toReturn;
     
 
