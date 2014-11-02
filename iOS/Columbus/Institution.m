@@ -46,5 +46,13 @@
 
 }
 
+-(NSString*) getOpeningHours{
+    for(NSArray *arr in self.openingHours){
+     //   = [value objectForKey:@"user"];
+    }
+   // self.openingHours
+    return @"Opening Hours";
+}
+
 
 @end

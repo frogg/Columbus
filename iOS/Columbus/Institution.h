@@ -18,7 +18,7 @@
 @property(readwrite) NSNumber *uuid;
 @property(readwrite) NSArray *keywords;
 @property(readwrite) NSString *type;
-@property(readwrite) NSString *openingHours;
+@property(readwrite) NSDictionary *openingHours;
 @property(readwrite) UIImage *image;
 @property(readwrite) NSString *imageURL;
 @property(readwrite) NSString *stadt;
