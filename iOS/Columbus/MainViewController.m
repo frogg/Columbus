@@ -15,6 +15,7 @@
 @implementation MainViewController
 @synthesize institutionOverView,aktuell,startimage;
 
+long lastPushNotificationTimeStamp;
 
 -(id) init {
     self = [super initWithNibName:nil bundle:nil];
