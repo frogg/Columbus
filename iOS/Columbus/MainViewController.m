@@ -30,10 +30,6 @@
         startimage.contentMode=UIViewContentModeScaleAspectFill;
         [self.view addSubview:startimage];
         
-       
-        
-        
-                
         institutionOverView = [[InstitutionOverviewView alloc] initWithFrame:self.view.frame];
         [self.view addSubview:institutionOverView];
         institutionOverView.delegate=self;

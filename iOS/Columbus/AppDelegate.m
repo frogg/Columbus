@@ -139,6 +139,8 @@ BOOL firststart;
                         institution.distance= [newLocation distanceFromLocation:[[CLLocation alloc] initWithLatitude:institution.location.latitude longitude:institution.location.longitude]];
                         
                         institution.uuid=[institutionDic objectForKey:@"pageid"];
+                        institution.openingHours=[institutionDic objectForKey:@"opening_hours"];
+                        
                        
                         NSLog(@"%@",institution.uuid);
                         
