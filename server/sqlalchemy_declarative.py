@@ -23,8 +23,7 @@ class User(Base):
 
 class Artikel(Base):
     __tablename__ = 'artikel'
-    id = Column(Integer, primary_key=True)
-    pageWikiId = Column(Integer)
+    pageWikiId = Column(Integer, primary_key=True)
     latitude = Column(Float)
     longitude = Column(Float)
     gattung = Column(String(50))
@@ -42,7 +41,7 @@ class Artikel(Base):
 class Schlagwort(Base):
     __tablename__ = 'schlagwort'
     id = Column(Integer, primary_key=True)
-    slide_id = Column(Integer, ForeignKey('artikel.id'))
+    slide_id = Column(Integer, ForeignKey('artikel.pageWikiId'))
     position = Column(Integer)
     text = Column(String(50))
 
@@ -54,7 +53,7 @@ class PersonalizedArtikel(Base):
     __tablename__ = 'personalized_artikel'
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey('user.id'))
-    artikel_id = Column(Integer, ForeignKey('artikel.id'))
+    artikel_id = Column(Integer, ForeignKey('artikel.pageWikiId'))
     user = relationship(User)
     artikel = relationship(Artikel)
     liked = Column(Boolean, default=True)
