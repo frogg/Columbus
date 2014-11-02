@@ -17,6 +17,7 @@ static Institution *lastPush;
 bool openedFromNotification;
 
 BOOL firststart;
+long lastPushNotificationTimeStamp;
 
 @synthesize locationManager,firstView;
 
@@ -93,7 +94,7 @@ BOOL firststart;
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         // do your background tasks here
-        NSMutableURLRequest *request =[NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://%@/get/articles/%f/%f?radius=1000&user=%@",[IP getIP],newLocation.coordinate.latitude,newLocation.coordinate.longitude,[LocalDataBase UUID]]]];
+        NSMutableURLRequest *request =[NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://%@/get/articles/%f/%f?radius=%@&user=%@",[IP getIP],newLocation.coordinate.latitude,newLocation.coordinate.longitude,[LocalDataBase meter],[LocalDataBase UUID]]]];
         
         //NSLog([NSString stringWithFormat:@"http://%@/get/articles/%f/%f?radius=1000&user=%@",[IP getIP],newLocation.coordinate.latitude,newLocation.coordinate.longitude,[LocalDataBase UUID]]);
         //    NSMutableURLRequest *request =[NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://google.de/%f/%f",newLocation.coordinate.latitude,newLocation.coordinate.longitude]]];
@@ -140,10 +141,14 @@ BOOL firststart;
                         
                         institution.uuid=[institutionDic objectForKey:@"pageid"];
                         institution.openingHours=[institutionDic objectForKey:@"opening_hours"];
+                        institution.url=[institutionDic objectForKey:@"url"];
+
                         NSLog(institution.openingHours.description);
                        
+
                        
                         NSLog(@"Öffnungszeiten%@", [institution getOpeningHours]);
+
                         
                         
                         institution.keywords=[institutionDic objectForKey:@"schlagworte"];
@@ -174,13 +179,25 @@ BOOL firststart;
                         notification.alertBody = [NSString stringWithFormat:@"%@ | %.0f m",pushInstitution.name,pushInstitution.distance];
                         notification.category=@"Boring";
                         notification.soundName=@"Widdewiddewiddbummbumm.mp3";
-                        [[UIApplication sharedApplication] scheduleLocalNotification:notification];
-                        NSLog(@"Push Notification Sent");
+                        
+                        if([[NSDate date] timeIntervalSince1970]-lastPushNotificationTimeStamp>=[[LocalDataBase time] intValue]*60) {
+                            [[UIApplication sharedApplication] scheduleLocalNotification:notification];
+                            NSLog(@"Push Notification Sent");
+                            if ( [[UIApplication sharedApplication] applicationState] != UIApplicationStateActive) {
+                                lastPushNotificationTimeStamp=[[NSDate date] timeIntervalSince1970];
+                                NSLog(@"timer refreshed");
+                            } else {
+                                NSLog(@"timer not refrehed, because app is active");
+                            }
+                        } else {
+                            NSLog(@"push not sent, user settings");
+                        }
+                        
                     } else {
-                        NSLog(@"keine geeigneten Museen in der Nähe gefunden");
+                        NSLog(@"1keine geeigneten Museen in der Nähe gefunden");
                     }
                 } else {
-                    NSLog(@"keine geeigneten Museen in der Nähe gefunden");
+                    NSLog(@"2keine geeigneten Museen in der Nähe gefunden");
                 }
             } else {
                 NSLog(@"Server nicht verfügbar.");

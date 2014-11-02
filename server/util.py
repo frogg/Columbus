@@ -108,7 +108,6 @@ def getPlacesAtLocation(lattitude, longitude, radius):
                         result['opening_times'][day] = [tempopening, tempclosing, row["open"]["time"], row["close"]["time"]]
                     else:
                         result['opening_times'][day] = [row["open"]["time"], None, None, row["close"]["time"]]
-    
             except KeyError as e:
                 print ("Error found:")
                 print (e)

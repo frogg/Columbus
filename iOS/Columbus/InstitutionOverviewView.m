@@ -77,6 +77,13 @@
     like.frame=CGRectMake(115, 590, 62, 62);
     [self addSubview:like];
     
+    UIButton *imageDetails = [UIButton buttonWithType:UIButtonTypeCustom];
+    [imageDetails addTarget:self action:@selector(details) forControlEvents:UIControlEventTouchUpInside];
+
+    imageDetails.frame=CGRectMake(0, 0, self.frame.size.width, 400);
+    [self addSubview:imageDetails];
+    
+    
     
     return self;
     

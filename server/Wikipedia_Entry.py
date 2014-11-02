@@ -7,7 +7,7 @@ from sqlalchemy_declarative import Artikel
 class Wikipedia_Entry():
 
     def __init__(self, name, latitude, longitude, type, distance,
-                 schlagworte, pageid, imageurl, opening_hours, address):
+                 schlagworte, pageid, imageurl, opening_hours, address, url):
         self.name = name
         self.latitude = latitude
         self.longitude = longitude
@@ -18,6 +18,7 @@ class Wikipedia_Entry():
         self.imageurl = imageurl
         self.opening_hours = opening_hours
         self.address = address
+        self.url = url
 
     @classmethod
     def fromWikiID(cls, pageid, distance, session):
@@ -36,7 +37,8 @@ class Wikipedia_Entry():
                        artikel.pageWikiId,
                        artikel.picUrl,
                        json.loads(artikel.offnungszeiten),
-                       artikel.address)
+                       artikel.address,
+                       artikel.url)
         except NoResultFound:
             return None
 
@@ -50,6 +52,7 @@ class Wikipedia_Entry():
             'imageurl': self.imageurl,
             'opening_hours': self.opening_hours,
             'address': self.address,
-            'distance': self.distance
+            'distance': self.distance,
+            'url': self.url
         }
         return dictionary

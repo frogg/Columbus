@@ -15,7 +15,7 @@
 @implementation MainViewController
 @synthesize institutionOverView,aktuell,startimage;
 
-long lastPushNotificationTimeStamp;
+
 
 -(id) init {
     self = [super initWithNibName:nil bundle:nil];
@@ -26,10 +26,7 @@ long lastPushNotificationTimeStamp;
         self.view.backgroundColor=[UIColor whiteColor];
         
         
-        startimage = [[UIImageView alloc] initWithFrame:self.view.frame];
-        startimage.image=[UIImage imageNamed:@"loading_screen.png"];
-        startimage.contentMode=UIViewContentModeScaleAspectFill;
-        [self.view addSubview:startimage];
+        
         
         institutionOverView = [[InstitutionOverviewView alloc] initWithFrame:self.view.frame];
         [self.view addSubview:institutionOverView];
@@ -46,6 +43,12 @@ long lastPushNotificationTimeStamp;
         [settings setImage:[UIImage imageNamed:@"settings_dark.png"] forState:UIControlStateNormal];
         settings.frame=CGRectMake(self.view.frame.size.width-24-30, 35-15, 24+30, 24+15);
         [self.view addSubview:settings];
+        
+        
+        startimage = [[UIImageView alloc] initWithFrame:self.view.frame];
+        startimage.image=[UIImage imageNamed:@"loading_screen.png"];
+        startimage.contentMode=UIViewContentModeScaleAspectFill;
+//        [self.view addSubview:startimage];
     }
     
     return self;
