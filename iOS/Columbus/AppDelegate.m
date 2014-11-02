@@ -170,7 +170,7 @@ BOOL firststart;
                         notification.fireDate = [NSDate date];
                         notification.alertBody = [NSString stringWithFormat:@"%@ | %.0f m",pushInstitution.name,pushInstitution.distance];
                         notification.category=@"Boring";
-                        notification.soundName=@"";
+                        notification.soundName=@"Widdewiddewiddbummbumm.mp3";
                         [[UIApplication sharedApplication] scheduleLocalNotification:notification];
                         NSLog(@"Push Notification Sent");
                     } else {

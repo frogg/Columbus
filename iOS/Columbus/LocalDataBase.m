@@ -35,8 +35,12 @@ NSString *timeDiff;
         NSString *result =[[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding];
         if(![result isEqualToString:@""] && result!=(NSString *) [NSNull null] && result) {
             NSDictionary *dic = [NSJSONSerialization JSONObjectWithData:responseData options:0 error:nil];
+            meter=@"250";
+            timeDiff=@"10";
             [self setUUID:[NSString stringWithFormat:@"%ld",(long)[[dic objectForKey:@"userID"] integerValue]]];
         }
+    } else {
+        [self getFromFile];
     }
 }
 
