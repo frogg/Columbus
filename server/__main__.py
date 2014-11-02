@@ -116,7 +116,8 @@ def getLocations(latitude, longitude, **kwargs):
                                     page_ID,
                                     image,
                                     opening_hours,
-                                    address
+                                    address,
+                                    url
                                     )
 
         articles.append(entry.toDict())
