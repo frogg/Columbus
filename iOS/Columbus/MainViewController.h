@@ -24,6 +24,7 @@
 @property(nonatomic) InstitutionOverviewView *institutionOverView;
 @property(nonatomic) Institution *institution;
 @property(nonatomic) int aktuell;
+@property(nonatomic) UIImageView *startimage;
 
 -(void) newInstitution:(Institution *) institutionneu;
 @end

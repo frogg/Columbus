@@ -14,5 +14,6 @@
 @interface SettingsViewController : UIViewController<CircularSliderDelegate>
 @property(nonatomic) UILabel *frequenzDetail;
 @property(nonatomic) UILabel *radiusDetail;
-
+@property(nonatomic) CircularSliderView *sliderView;
+@property(nonatomic) CircularSliderView *maxdistance;
 @end

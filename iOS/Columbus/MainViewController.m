@@ -13,7 +13,7 @@
 @end
 
 @implementation MainViewController
-@synthesize institutionOverView,aktuell;
+@synthesize institutionOverView,aktuell,startimage;
 
 
 -(id) init {
@@ -25,25 +25,15 @@
         self.view.backgroundColor=[UIColor whiteColor];
         
         
+        startimage = [[UIImageView alloc] initWithFrame:self.view.frame];
+        startimage.image=[UIImage imageNamed:@"loading_screen.png"];
+        startimage.contentMode=UIViewContentModeScaleAspectFill;
+        [self.view addSubview:startimage];
+        
+       
         
         
-        
-        UIImageView *image = [[UIImageView alloc] initWithFrame:self.view.frame];
-        image.image=[UIImage imageNamed:@"loading_screen.png"];
-        image.contentMode=UIViewContentModeScaleAspectFill;
-        [self.view addSubview:image];
-        
-        [UIView animateWithDuration:0.5
-                              delay:2
-                            options: UIViewAnimationOptionCurveEaseOut
-                         animations:^
-         {
-             image.alpha=0;
-         }
-                         completion:^(BOOL finished)
-         {
-         }];
-        
+                
         institutionOverView = [[InstitutionOverviewView alloc] initWithFrame:self.view.frame];
         [self.view addSubview:institutionOverView];
         institutionOverView.delegate=self;
@@ -149,6 +139,7 @@
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         // do your background tasks here
         NSMutableURLRequest *request =[NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://%@/post/user/profile/%@/%@?liked=true&time=2010",[IP getIP],i.uuid,[LocalDataBase UUID]]]];
+        #warning HIER IST NOCH EIN HARD CODE (DIE ZEIT DIE ICH ES ANSCHAUE IN MILISEKUNDEN 2010)
         //    NSMutableURLRequest *request =[NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://google.de/%f/%f",newLocation.coordinate.latitude,newLocation.coordinate.longitude]]];
         
         [request setHTTPMethod:@"POST"];
@@ -187,6 +178,7 @@
 -(void) newInstitution:(Institution *) institutionneu {
     
     self.institution=institutionneu;
+    startimage.alpha=0;
     [institutionOverView setInstitution:self.institution];
     
 }

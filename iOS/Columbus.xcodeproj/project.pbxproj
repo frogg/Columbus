@@ -37,6 +37,7 @@
 		51CF89671A05660E001E612E /* IP.m in Sources */ = {isa = PBXBuildFile; fileRef = 51CF89661A05660E001E612E /* IP.m */; };
 		51CF89A21A0567EE001E612E /* libMapbox.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 51CF89A11A0567EE001E612E /* libMapbox.a */; };
 		51CF89A41A0567F2001E612E /* Mapbox.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 51CF89A31A0567F2001E612E /* Mapbox.bundle */; };
+		51D4D2251A06204C003C6014 /* Widdewiddewiddbummbumm.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 51D4D2241A06204C003C6014 /* Widdewiddewiddbummbumm.mp3 */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -154,6 +155,7 @@
 		51CF89A01A0567E9001E612E /* RMUserTrackingBarButtonItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RMUserTrackingBarButtonItem.h; sourceTree = "<group>"; };
 		51CF89A11A0567EE001E612E /* libMapbox.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libMapbox.a; sourceTree = "<group>"; };
 		51CF89A31A0567F2001E612E /* Mapbox.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Mapbox.bundle; sourceTree = "<group>"; };
+		51D4D2241A06204C003C6014 /* Widdewiddewiddbummbumm.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = Widdewiddewiddbummbumm.mp3; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -185,6 +187,7 @@
 		51C0531F1A03FC8000A1C15C = {
 			isa = PBXGroup;
 			children = (
+				51D4D2241A06204C003C6014 /* Widdewiddewiddbummbumm.mp3 */,
 				51CF895C1A05377F001E612E /* MBFingerTipWindow.h */,
 				51CF895D1A05377F001E612E /* MBFingerTipWindow.m */,
 				51CF89571A052115001E612E /* libz.dylib */,
@@ -436,6 +439,7 @@
 			files = (
 				51CF89A41A0567F2001E612E /* Mapbox.bundle in Resources */,
 				51CF87261A041ABA001E612E /* Merzedes Benz World.gpx in Resources */,
+				51D4D2251A06204C003C6014 /* Widdewiddewiddbummbumm.mp3 in Resources */,
 				51CF87441A04E9A6001E612E /* b.png in Resources */,
 				51CF87431A04E9A6001E612E /* a.png in Resources */,
 				51C0533C1A03FC8000A1C15C /* LaunchScreen.xib in Resources */,
