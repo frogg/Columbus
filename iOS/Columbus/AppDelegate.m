@@ -249,6 +249,7 @@ long lastPushNotificationTimeStamp;
     {
         openedFromNotification=YES;
         [firstView newInstitution:lastPush];
+        [self.firstView.navigationController popToRootViewControllerAnimated:YES];
         NSLog(@"YES");
         firststart=false;
     }
