@@ -30,6 +30,13 @@
         institutionImage.clipsToBounds=YES;
         void (^block)(UIImage *) = ^(UIImage *image) {
             [self performSelectorInBackground:@selector(blurImageInBackground:) withObject:image];
+            if(!image) {
+                UIButton *back = [UIButton buttonWithType:UIButtonTypeCustom];
+                [back addTarget:self action:@selector(back) forControlEvents:UIControlEventTouchUpInside];
+                [back setImage:[UIImage imageNamed:@"back_dark.png"] forState:UIControlStateNormal];
+                back.frame=CGRectMake(15, 35, 24, 24);
+                [self.view addSubview:back];
+            }
         };
         
         [institution performSelectorInBackground:@selector(imageUsingBlock:) withObject:block];
@@ -68,7 +75,7 @@
         
 
         UIButton *google = [UIButton buttonWithType:UIButtonTypeCustom];
-        [google addTarget:self action:@selector(back) forControlEvents:UIControlEventTouchUpInside];
+        [google addTarget:self action:@selector(route) forControlEvents:UIControlEventTouchUpInside];
         [google setImage:[UIImage imageNamed:@"btn_google_maps.png"] forState:UIControlStateNormal];
         google.frame=CGRectMake(0, self.view.frame.size.height-53, self.view.frame.size.width/3, 53);
         [self.view addSubview:google];
@@ -147,6 +154,12 @@
 
 -(UIStatusBarStyle)preferredStatusBarStyle{
     return UIStatusBarStyleLightContent;
+}
+
+-(void) route {
+
+    [[UIApplication sharedApplication] openURL:
+     [NSURL URLWithString:[NSString stringWithFormat:@"comgooglemaps://?daddr=%f,%f",self.institution.location.latitude,self.institution.location.longitude]]];
 }
 
 /*
