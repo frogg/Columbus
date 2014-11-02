@@ -49,6 +49,7 @@ class Wikipedia_Entry():
             'pageid': self.pageid,
             'imageurl': self.imageurl,
             'opening_hours': self.opening_hours,
-            'address': self.address
+            'address': self.address,
+            'distance': self.distance
         }
         return dictionary

@@ -1,10 +1,8 @@
-def calculateLikes(likes, dislikes, totalLikeTime):
+import telnetlib
 
-    if isinstance(likes, int) and isinstance(dislikes, int) and isinstance(totalLikeTime, int):
-        average_time = totalLikeTime/(likes+dislikes)/500
 
-        totalLikes = (likes-dislikes)+average_time
 
-        return totalLikes
-    else:
-        return None
+host = "towel.Blinkenlights.nl"
+tn = telnetlib.Telnet()
+tn.open(host, 666)
+error = tn.read_all().decode('ascii').replace("\n","").replace("\r","").split("===")[2]

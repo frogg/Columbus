@@ -1,6 +1,7 @@
 import requests
 import hashlib
 from sqlalchemy_declarative import Rating
+from sqlalchemy.orm.exc import NoResultFound
 
 def getPlacesAtLocation(lattitude, longitude, radius):
     try:
@@ -189,17 +190,27 @@ def getSchlagworter(title, url):
     return keywords[:5]
 
 
-def calculateLikes(category, userID, session):
-    ratingCategory = session.query(Rating).filter(
-        Rating.user_id == userID
-        ).filter(
-        category == Rating.categoryName
-        ).one()
-    likes = ratingCategory.likes
-    dislikes = ratingCategory.dislikes
-    totalLikeTime = ratingCategory.totalLikeTime
-    average_time = totalLikeTime/(likes+dislikes)/500
+def calculateLikes(category, userID, session, distance):
+    try:
+        if category:
+            ratingCategory = session.query(Rating).filter(
+                Rating.user_id == userID
+                ).filter(
+                category == Rating.categoryName
+                ).one()
+        else:
+            ratingCategory = session.query(Rating).filter(
+                Rating.user_id == userID
+                ).filter(
+                Rating.categoryName == None
+                ).one()
+        likes = ratingCategory.likes
+        dislikes = ratingCategory.dislikes
+        totalLikeTime = ratingCategory.totalLikeTime
+        average_time = totalLikeTime/(likes+dislikes)/500
 
-    totalLikes = (likes-dislikes)+average_time
+        totalLikes = ((likes-dislikes)+average_time)*1000-distance
 
-    return totalLikes
+        return totalLikes
+    except NoResultFound:
+        return 1
