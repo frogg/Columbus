@@ -141,9 +141,16 @@ long lastPushNotificationTimeStamp;
                         
                         institution.uuid=[institutionDic objectForKey:@"pageid"];
                         institution.openingHours=[institutionDic objectForKey:@"opening_hours"];
+<<<<<<< HEAD
                         
                         
                         //NSLog(@"%@",institution.uuid);
+=======
+                        NSLog(institution.openingHours.description);
+                        [institution getOpeningHours];
+                       
+                        NSLog(@"%@",institution.uuid);
+>>>>>>> fa3a0c1aed4c8b43ec55b61c6db72d94ce76e886
                         
                         
                         institution.keywords=[institutionDic objectForKey:@"schlagworte"];

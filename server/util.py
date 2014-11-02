@@ -1,6 +1,7 @@
 import requests
 import hashlib
-import math
+from sqlalchemy_declarative import Rating
+from sqlalchemy.orm.exc import NoResultFound
 
 def getPlacesAtLocation(lattitude, longitude, radius):
     try:
@@ -22,7 +23,8 @@ def getPlacesAtLocation(lattitude, longitude, radius):
         types = "|".join(types)
         result = {}
         shittyHardcodedBlacklist = ["establishment"]
-        shittyHardcodedTierlist1 = ["museum", "library"]
+        shittyHardcodedTierlist1 = ["museum", "library", "church", "bibliothek", "university", "universität"]
+        supershittygermanpythondictionary = {"bücherei":"library","kirche":"church","universität":"university"}
         shittyHardcodedTierlist2 = [""]
         shittyHardcodedTierlist3 = [""]
         try:
@@ -33,7 +35,7 @@ def getPlacesAtLocation(lattitude, longitude, radius):
             
             try:
                 result['address'] = r['result']['formatted_address']
-            except:
+            except KeyError:
                 result['address'] = None
 
             try:
@@ -62,6 +64,15 @@ def getPlacesAtLocation(lattitude, longitude, radius):
 
             except KeyError:
                 result['types'] = None
+
+            if result['types'] == None:
+                for x in shittyHardcodedTierlist1:
+                    if x in r['result']['name']:
+                        result['types'] = x
+
+            if result['types'] in supershittygermanpythondictionary:
+                result['types'] = supershittygermanpythondictionary[result['types']]
+
             try:
                 if r['result']['opening_hours']['open_now']:
                     result['open_now'] = r['result']['opening_hours']['open_now']
@@ -115,7 +126,7 @@ def getPlacesAtLocation(lattitude, longitude, radius):
 
 
 def geosearch(latitude, longitude, gtype,radius): 
-    return apicall('en', 'query', 'json', "&type={0}&gsradius={3}&gscoord={1}|{2}&list=geosearch".format(gtype, latitude,longitude,radius)).get('query').get('geosearch')
+    return apicall('en', 'query', 'json', "&type={0}&gsradius={3}&gscoord={1}|{2}&gslimit=20&gsprop=type&list=geosearch".format(gtype, latitude,longitude,radius)).get('query').get('geosearch')
 
 
 def getImage(page_IDs):
@@ -179,17 +190,27 @@ def getSchlagworter(title, url):
     return keywords[:5]
 
 
-def calculateLikes(likes, dislikes, totalLikeTime):
+def calculateLikes(category, userID, session, distance):
+    try:
+        if category:
+            ratingCategory = session.query(Rating).filter(
+                Rating.user_id == userID
+                ).filter(
+                category == Rating.categoryName
+                ).one()
+        else:
+            ratingCategory = session.query(Rating).filter(
+                Rating.user_id == userID
+                ).filter(
+                Rating.categoryName == None
+                ).one()
+        likes = ratingCategory.likes
+        dislikes = ratingCategory.dislikes
+        totalLikeTime = ratingCategory.totalLikeTime
+        average_time = totalLikeTime/(likes+dislikes)/500
 
-    likeMultiplier = 4
-    if isinstance(likes, int) and isinstance(dislikes, int) and isinstance(totalLikeTime, int):
-        totalVotes = likes + dislikes
-        averageTime = totalLikeTime / totalVotes
-        timeLikes = totalLikeTime / (averageTime*likeMultiplier)
-        print (timeLikes)
-        totalLikes = (likes + timeLikes - dislikes)*20
-        if totalLikes > 1000:
-            totalLikes = 1000
+        totalLikes = ((likes-dislikes)+average_time)*1000-distance
+
         return totalLikes
-    else:
-        return None
+    except NoResultFound:
+        return 1
