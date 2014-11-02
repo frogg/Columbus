@@ -48,7 +48,7 @@
         startimage = [[UIImageView alloc] initWithFrame:self.view.frame];
         startimage.image=[UIImage imageNamed:@"loading_screen.png"];
         startimage.contentMode=UIViewContentModeScaleAspectFill;
-//        [self.view addSubview:startimage];
+        [self.view addSubview:startimage];
     }
     
     return self;

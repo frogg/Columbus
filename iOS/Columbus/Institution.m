@@ -97,7 +97,7 @@
             NSString* toReturn = @"";
         for(int i=0; i<[weekdays count]; i++){
             if(![[weekdays objectAtIndex:i] isEqualToString:[weekdaysUnChanged objectAtIndex:i]]){
-                toReturn = [NSString stringWithFormat:@"%@%@\n",toReturn,[weekdays objectAtIndex:i]] ;
+                toReturn = [NSString stringWithFormat:@"%@%@<br>",toReturn,[weekdays objectAtIndex:i]] ;
 
             }
         }

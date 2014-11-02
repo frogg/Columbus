@@ -21,7 +21,7 @@
     if(self) {
         self.view.backgroundColor=[UIColor whiteColor];
         
-        scrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.width-53)];
+        scrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height-53)];
         [self.view addSubview:scrollView];
         
         self.institution=institution;
@@ -141,7 +141,7 @@
 
 -(NSString *) getHTMlString {
     
-    return [NSString stringWithFormat:@"<html><head><style type=\"text/css\">a{color: #BD997C;}  tit {	font-size: 27;    font-family: HelveticaNeue-Medium;    color: #BD997C;} sub {	font-size: 17;    font-family: HelveticaNeue-light;    color: #BD997C;}  txt {	font-size: 17;    font-family: HelveticaNeue-light;    color: #000000;}    </style></head><center><tit>%@</tit><br><sub>%@</sub><br><br><br><br></center><txt>%@<br><br><a href='%@'><i>Read more on  Wikipedia.</i></a><br><br><br>Hours of opening:<br>SU: 10:00 - 19:00</txt></br></html>",self.institution.name,self.institution.type,self.institution.beschreibung,self.institution.url];
+    return [NSString stringWithFormat:@"<html><head><style type=\"text/css\">a{color: #BD997C;}  tit {	font-size: 27;    font-family: HelveticaNeue-Medium;    color: #BD997C;} sub {	font-size: 17;    font-family: HelveticaNeue-light;    color: #BD997C;}  txt {	font-size: 17;    font-family: HelveticaNeue-light;    color: #000000;}    </style></head><center><tit>%@</tit><br><sub>%@</sub><br><br><br><br></center><txt>%@<br><br><a href='%@'><i>Read more on  Wikipedia.</i></a><br><br><br>%@</txt></br></html>",self.institution.name,self.institution.type,self.institution.beschreibung,self.institution.url,[self.institution getOpeningHours]];
     #warning HIER IST NOCH EIN HARD CODE (DIE ÖFFNUNGSZEITEN)
 }
 
