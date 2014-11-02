@@ -239,10 +239,10 @@ def page_not_found(error):
     return Response("You shall not find what you are looking for", 404).response()
 
 if __name__ == '__main__':
-    mysqlhost = '127.0.0.1'
+    mysqlhost = '192.168.1.83'
     mysqlport = 3306
-    mysqluser = 'root'
-    mysqlpassword = 'asdf1234'
+    mysqluser = 'kolumbus'
+    mysqlpassword = '1234'
     mysqldb = 'kolumbus'
     engine = create_engine("mysql+pymysql://{0}:{1}@{2}/{3}?charset=utf8"
                            .format(mysqluser,

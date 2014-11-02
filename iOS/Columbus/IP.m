@@ -11,7 +11,7 @@
 @implementation IP
 
 +(NSString *) getIP {
-    return @"192.168.1.83:5000";
+    return @"192.168.1.52:5000";
 }
 
 @end
