@@ -15,6 +15,7 @@
 @implementation MainViewController
 @synthesize institutionOverView,aktuell,startimage;
 
+long lastPushNotificationTimeStamp;
 
 -(id) init {
     self = [super initWithNibName:nil bundle:nil];
@@ -30,10 +31,6 @@
         startimage.contentMode=UIViewContentModeScaleAspectFill;
         [self.view addSubview:startimage];
         
-       
-        
-        
-                
         institutionOverView = [[InstitutionOverviewView alloc] initWithFrame:self.view.frame];
         [self.view addSubview:institutionOverView];
         institutionOverView.delegate=self;

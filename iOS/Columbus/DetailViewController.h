@@ -10,11 +10,12 @@
 #import "UIImage+ImageEffects.h"
 #import "Institution.h"
 
-@interface DetailViewController : UIViewController
+@interface DetailViewController : UIViewController <UIScrollViewDelegate, UIWebViewDelegate>
 
 @property(nonatomic) UIImageView *institutionImage;
 @property(nonatomic) UIWebView *webView;
 @property(nonatomic) Institution *institution;
+@property(nonatomic) UIScrollView *scrollView;
 
 -(id) initWithInstitution:(Institution *) institution;
 

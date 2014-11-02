@@ -13,13 +13,17 @@
 @end
 
 @implementation DetailViewController
-@synthesize institutionImage,webView;
+@synthesize institutionImage,webView,scrollView;
 
 -(id) initWithInstitution:(Institution *) institution {
     self=[super initWithNibName:nil bundle:nil];
     
     if(self) {
         self.view.backgroundColor=[UIColor whiteColor];
+        
+        scrollView = [[UIScrollView alloc] initWithFrame:self.view.frame];
+        [self.view addSubview:scrollView];
+        
         self.institution=institution;
         institutionImage = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, 200)];
         institutionImage.contentMode=UIViewContentModeScaleAspectFill;
@@ -33,10 +37,10 @@
         
         
         
-        [self.view addSubview:institutionImage];
+        [scrollView addSubview:institutionImage];
         
         webView = [[UIWebView alloc] initWithFrame:CGRectMake(0, 100, self.view.frame.size.width, self.view.frame.size.height-100)];
-        [self.view addSubview:webView];
+        [scrollView addSubview:webView];
         
         
         
@@ -60,10 +64,15 @@
         back.frame=CGRectMake(15, 35, 24, 24);
         [self.view addSubview:back];
         
+
         
         
     }
     return self;
+}
+
+-(void) webViewDidFinishLoad:(UIWebView *)currentwebView {
+    scrollView.contentSize=CGSizeMake(self.view.frame.size.width, webView.scrollView.contentSize.height+webView.frame.origin.y);
 }
 
 - (void)viewDidLoad {
