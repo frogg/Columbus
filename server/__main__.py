@@ -1,8 +1,6 @@
 import wikipedia
 import json
-
 import markdown
-import math
 
 from flask import Flask, jsonify, request, render_template, Markup
 
@@ -30,14 +28,17 @@ def readme():
         content = Markup(markdown.markdown(content))
     return render_template('index.html', **locals())
 
-
+@app.route('/get/articles/<latitude>/<longitude>/')
 @app.route('/get/articles/<latitude>/<longitude>')
 def getLocations(latitude, longitude, **kwargs):
+    userID = int(request.args.get('user', 0))
     session = DBSession()
     articles = []
     radius = request.args.get('radius', 1000)
-
+    wikiCategorieBlacklist = ['adm2nd', 'adm1st', 'adm3nd', 'river', 'forest']
     for article in geosearch(latitude, longitude, 'landmark', radius):
+        if article.get('type') in wikiCategorieBlacklist:
+            continue
         if len(articles) > 50:
             break
         title = article.get('title')
@@ -45,13 +46,12 @@ def getLocations(latitude, longitude, **kwargs):
         longitude = article.get('lon')
         distance = article.get('dist')
         page_ID = article.get('pageid')
-
         entry = Wikipedia_Entry.fromWikiID(page_ID, distance, session)
         if not entry:
              # Google Api
             googleResults = getPlacesAtLocation(latitude,
                                                 longitude,
-                                                radius)
+                                                70)
             types = googleResults.get('types')
             opening_hours = googleResults.get('opening_times'),
             address = googleResults.get('address')
@@ -91,6 +91,9 @@ def getLocations(latitude, longitude, **kwargs):
                                     )
 
         articles.append(entry.toDict())
+    session.close()
+    if userID:
+        articles = sorted(articles, key=lambda article: calculateLikes(article.get('type'), userID, session)) 
     return jsonify({'notes': articles})
 
 
@@ -101,7 +104,9 @@ def getDetails(pageid):
 
     If not object is found it returns a 404.
     '''
+    session = DBSession()
     try:
+
         artikel = session.query(Artikel).filter(
             Artikel.pageWikiId == pageid
             ).one()
@@ -114,22 +119,41 @@ def getDetails(pageid):
             session.commit()
     except NoResultFound:
         return "Error", 404
-
+    session.close()
     return jsonify({'summary': summary})
 
 
 @app.route('/get/userID/')
 def getUserID():
+    session = DBSession()
     new_user = User()
     session.add(new_user)
     session.commit()
-    return jsonify({'userID': new_user.id})
+    userid = new_user.id
+    session.close()
+    return jsonify({'userID': userid})
 
 
-@app.route('/post/user/profile/<pageid>/<userID>')
+@app.route('/post/user/profile/<pageid>/<userID>', methods=['POST'])
 def setUserInfo(pageid, userID):
-    liked = request.args.get('liked', True)
     try:
+        userID = int(userID)
+        pageid = int(pageid)
+        
+        time = int(request.args.get('time', 0))
+    except ValueError:
+        return "You Sir, fucked up", 400
+    session = DBSession()
+    liked = request.args.get('liked', True)
+    if liked == "true":
+        liked = True
+    else:
+        liked = False
+
+    try:
+        article = session.query(Artikel).filter(
+            Artikel.pageWikiId == pageid
+            ).one()
         user = session.query(User).filter(User.id == userID).one()
         try:
             bewertung = session.query(PersonalizedArtikel).filter(
@@ -137,23 +161,42 @@ def setUserInfo(pageid, userID):
                 ).filter(
                 PersonalizedArtikel.artikel_id == pageid
                 ).one()
+
             if bewertung.liked != liked:
                 bewertung.liked = liked
                 session.add(bewertung)
 
         except NoResultFound:
-            article = session.query(Artikel).filter(
-                Artikel.pageWikiId == pageid
-                ).one()
-            paritkel = PersonalizedArtikel(user=user,
-                                           artikel=article,
-                                           liked=liked,
-                                           counter=0)
+            bewertung = PersonalizedArtikel(user=user,
+                                            artikel=article,
+                                            liked=liked,
+                                            counter=0)
 
-            session.add(paritkel)
+            session.add(bewertung)
+        try:
+            ratingCategory = session.query(Rating).filter(
+                Rating.user_id == userID
+                ).filter(
+                article.gattung == Rating.categoryName
+                ).one()
+        except NoResultFound:
+            ratingCategory = Rating(user_id=userID,
+                                    categoryName=article.gattung,
+                                    likes=0,
+                                    dislikes=0,
+                                    totalLikeTime=0)
+        if liked:
+            ratingCategory.likes += 1
+            ratingCategory.totalLikeTime = ratingCategory.totalLikeTime + time
+        else:
+            ratingCategory.dislikes += 1
+        session.add(ratingCategory)
         session.commit()
     except NoResultFound:
-        return 404
+        session.close()
+        return "Unkown User ID", 404
+
+    session.close()
     return jsonify({'sucess': True})
 
 
