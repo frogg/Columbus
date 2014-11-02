@@ -92,16 +92,17 @@
                     
                    
                 }
-            }
+        }else{
+            return @"";
+        }
     
         NSDateFormatter *wochentag = [[NSDateFormatter alloc] init];
         [wochentag setDateFormat: @"e"];
-        int wochentagIndex = (int)[[wochentag stringFromDate:[NSDate date]] integerValue];
+        int wochentagIndex = (int)[[wochentag stringFromDate:[NSDate date]] integerValue]-1;
         
         NSString* toReturn = @"";
         for(int i=0; i<[weekdays count]; i++){
             if(![[weekdays objectAtIndex:i] isEqualToString:[weekdaysUnChanged objectAtIndex:i]]){
-
                 if(i==wochentagIndex){
                     toReturn = [NSString stringWithFormat:@"%@<b>%@</b><br>",toReturn,[weekdays objectAtIndex:i]] ;
                 }else{
