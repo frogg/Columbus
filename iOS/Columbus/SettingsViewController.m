@@ -105,10 +105,10 @@
 
 -(void) newOutputString:(NSString *)string forType:(int)type {
     if(type==0) {
-        radiusDetail.text=[NSString stringWithFormat:@"Einrichtungen im Umkreis von %@ suchen.",string];
+        radiusDetail.text=[NSString stringWithFormat:@"Search for institutions within a radius of %@.",string];
     }
     if(type==1) {
-        frequenzDetail.text=[NSString stringWithFormat:@"Alle %@ nach neuen Einrichtungen suchen.",string];
+        frequenzDetail.text=[NSString stringWithFormat:@"Search every %@ for institutions.",string];
     }
 }
 

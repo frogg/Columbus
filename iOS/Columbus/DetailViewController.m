@@ -38,12 +38,13 @@
         
         
         [scrollView addSubview:institutionImage];
+        scrollView.delegate=self;
         
         webView = [[UIWebView alloc] initWithFrame:CGRectMake(0, 100, self.view.frame.size.width, self.view.frame.size.height-100)];
         [scrollView addSubview:webView];
+        webView.delegate=self;
         
-        
-        
+        webView.userInteractionEnabled=NO;
         
         webView.opaque=NO;
         webView.backgroundColor=[UIColor clearColor];
@@ -65,6 +66,26 @@
         [self.view addSubview:back];
         
 
+        UIButton *google = [UIButton buttonWithType:UIButtonTypeCustom];
+        [google addTarget:self action:@selector(back) forControlEvents:UIControlEventTouchUpInside];
+        [google setImage:[UIImage imageNamed:@"btn_google_maps.png"] forState:UIControlStateNormal];
+        google.frame=CGRectMake(0, 610, 44, 116);
+        [self.view addSubview:google];
+        
+        UIButton *favorize = [UIButton buttonWithType:UIButtonTypeCustom];
+        [favorize addTarget:self action:@selector(back) forControlEvents:UIControlEventTouchUpInside];
+        [favorize setImage:[UIImage imageNamed:@"btn_heart.png"] forState:UIControlStateNormal];
+        favorize.frame=CGRectMake(116, 610, 44, 116);
+        [self.view addSubview:favorize];
+        
+        UIButton *map = [UIButton buttonWithType:UIButtonTypeCustom];
+        [map addTarget:self action:@selector(back) forControlEvents:UIControlEventTouchUpInside];
+        [map setImage:[UIImage imageNamed:@"btn_karte.png"] forState:UIControlStateNormal];
+        map.frame=CGRectMake(232, 610, 44, 116);
+        [self.view addSubview:map];
+        
+
+        
         
         
     }
@@ -72,7 +93,21 @@
 }
 
 -(void) webViewDidFinishLoad:(UIWebView *)currentwebView {
-    scrollView.contentSize=CGSizeMake(self.view.frame.size.width, webView.scrollView.contentSize.height+webView.frame.origin.y);
+    
+    scrollView.contentSize=CGSizeMake(self.view.frame.size.width, currentwebView.scrollView.contentSize.height+currentwebView.frame.origin.y);
+    if(currentwebView.scrollView.contentSize.height+currentwebView.frame.origin.y<scrollView.frame.size.height) {
+        scrollView.contentSize=CGSizeMake(self.view.frame.size.width, scrollView.frame.size.height+1);
+    }
+    currentwebView.frame=CGRectMake(0, 100, self.view.frame.size.width, currentwebView.scrollView.contentSize.height);
+    NSLog(@"%f",currentwebView.scrollView.contentSize.height);
+}
+
+-(void) scrollViewDidScroll:(UIScrollView *)scrollView {
+    if(scrollView.contentOffset.y<0) {
+        institutionImage.frame=CGRectMake(0, scrollView.contentOffset.y, self.view.frame.size.width, 200-scrollView.contentOffset.y);
+    } else {
+        institutionImage.frame=CGRectMake(0, 0, self.view.frame.size.width, 200);
+    }
 }
 
 - (void)viewDidLoad {
