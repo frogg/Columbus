@@ -141,6 +141,7 @@ long lastPushNotificationTimeStamp;
                         
                         institution.uuid=[institutionDic objectForKey:@"pageid"];
                         institution.openingHours=[institutionDic objectForKey:@"opening_hours"];
+                        institution.url=[institutionDic objectForKey:@"url"];
 
                         NSLog(institution.openingHours.description);
                         [institution getOpeningHours];

@@ -21,7 +21,7 @@
     if(self) {
         self.view.backgroundColor=[UIColor whiteColor];
         
-        scrollView = [[UIScrollView alloc] initWithFrame:self.view.frame];
+        scrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.width-44)];
         [self.view addSubview:scrollView];
         
         self.institution=institution;
@@ -44,7 +44,8 @@
         [scrollView addSubview:webView];
         webView.delegate=self;
         
-        webView.userInteractionEnabled=NO;
+        webView.userInteractionEnabled=YES;
+        webView.scrollView.scrollEnabled=NO;
         
         webView.opaque=NO;
         webView.backgroundColor=[UIColor clearColor];
@@ -69,19 +70,19 @@
         UIButton *google = [UIButton buttonWithType:UIButtonTypeCustom];
         [google addTarget:self action:@selector(back) forControlEvents:UIControlEventTouchUpInside];
         [google setImage:[UIImage imageNamed:@"btn_google_maps.png"] forState:UIControlStateNormal];
-        google.frame=CGRectMake(0, 610, 44, 116);
+        google.frame=CGRectMake(0, self.view.frame.size.height-53, self.view.frame.size.width/3, 53);
         [self.view addSubview:google];
         
         UIButton *favorize = [UIButton buttonWithType:UIButtonTypeCustom];
         [favorize addTarget:self action:@selector(back) forControlEvents:UIControlEventTouchUpInside];
         [favorize setImage:[UIImage imageNamed:@"btn_heart.png"] forState:UIControlStateNormal];
-        favorize.frame=CGRectMake(116, 610, 44, 116);
+        favorize.frame=CGRectMake(self.view.frame.size.width/3, self.view.frame.size.height-53, self.view.frame.size.width/3, 53);
         [self.view addSubview:favorize];
         
         UIButton *map = [UIButton buttonWithType:UIButtonTypeCustom];
         [map addTarget:self action:@selector(back) forControlEvents:UIControlEventTouchUpInside];
         [map setImage:[UIImage imageNamed:@"btn_karte.png"] forState:UIControlStateNormal];
-        map.frame=CGRectMake(232, 610, 44, 116);
+        map.frame=CGRectMake(2*(self.view.frame.size.width/3), self.view.frame.size.height-53, self.view.frame.size.width/3, 53);
         [self.view addSubview:map];
         
 
@@ -90,6 +91,15 @@
         
     }
     return self;
+}
+
+-(BOOL) webView:(UIWebView *)inWeb shouldStartLoadWithRequest:(NSURLRequest *)inRequest navigationType:(UIWebViewNavigationType)inType {
+    if ( inType == UIWebViewNavigationTypeLinkClicked ) {
+        [[UIApplication sharedApplication] openURL:[inRequest URL]];
+        return NO;
+    }
+    
+    return YES;
 }
 
 -(void) webViewDidFinishLoad:(UIWebView *)currentwebView {
@@ -131,7 +141,7 @@
 
 -(NSString *) getHTMlString {
     
-    return [NSString stringWithFormat:@"<html><head><style type=\"text/css\">a{color: #BD997C;}  tit {	font-size: 27;    font-family: HelveticaNeue-Medium;    color: #BD997C;} sub {	font-size: 17;    font-family: HelveticaNeue-light;    color: #BD997C;}  txt {	font-size: 17;    font-family: HelveticaNeue-light;    color: #000000;}    </style></head><center><tit>%@</tit><br><sub>%@</sub><br><br><br><br></center><txt>%@<br><br><a href=''><i>Read more on  Wikipedia.</i></a><br><br><br>Hours of opening:<br>SU: 10:00 - 19:00</txt></br></html>",self.institution.name,self.institution.type,self.institution.beschreibung];
+    return [NSString stringWithFormat:@"<html><head><style type=\"text/css\">a{color: #BD997C;}  tit {	font-size: 27;    font-family: HelveticaNeue-Medium;    color: #BD997C;} sub {	font-size: 17;    font-family: HelveticaNeue-light;    color: #BD997C;}  txt {	font-size: 17;    font-family: HelveticaNeue-light;    color: #000000;}    </style></head><center><tit>%@</tit><br><sub>%@</sub><br><br><br><br></center><txt>%@<br><br><a href='%@'><i>Read more on  Wikipedia.</i></a><br><br><br>Hours of opening:<br>SU: 10:00 - 19:00</txt></br></html>",self.institution.name,self.institution.type,self.institution.beschreibung,self.institution.url];
     #warning HIER IST NOCH EIN HARD CODE (DIE ÖFFNUNGSZEITEN)
 }
 

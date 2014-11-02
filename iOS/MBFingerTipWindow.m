@@ -56,6 +56,7 @@
     //
     self = [super initWithCoder:decoder];
 
+    
     if (self != nil)
         [self MBFingerTipWindow_commonInit];
     
