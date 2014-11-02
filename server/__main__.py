@@ -87,6 +87,7 @@ def getLocations(latitude, longitude, **kwargs):
             # Wiki Api
             image = getImage([str(page_ID)])
             page = wikipedia.page(title, auto_suggest=True, redirect=False)
+            url = page.url
 
             # Alchemy Api
             keywords = getSchlagworter(page.title, page.url)

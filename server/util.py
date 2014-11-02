@@ -141,6 +141,8 @@ def getImage(page_IDs):
                     if imagename in name.get('title'):
                         continue
                     image = calculateWikimediaFilePath(name.get('title'))
+        if ".svg" in image:
+            return None
         return image
     except AttributeError:
         return None
