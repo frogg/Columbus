@@ -24,6 +24,7 @@
 @property(readwrite) NSString *stadt;
 @property(readwrite) CLLocationCoordinate2D location;
 @property(readwrite) NSString *beschreibung;
+@property(readwrite) NSString *url;
 
 -(void) imageUsingBlock:(void (^)(UIImage *image))block;
 -(void) descriptionUsingBlock:(void (^)(NSString *beschriebung))block;

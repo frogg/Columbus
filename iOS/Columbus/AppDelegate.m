@@ -141,11 +141,13 @@ long lastPushNotificationTimeStamp;
                         
                         institution.uuid=[institutionDic objectForKey:@"pageid"];
                         institution.openingHours=[institutionDic objectForKey:@"opening_hours"];
+                        institution.url=[institutionDic objectForKey:@"url"];
 
                         NSLog(institution.openingHours.description);
-                        [institution getOpeningHours];
                        
-                       // NSLog(@"%@",institution.uuid);
+
+                       
+                        NSLog(@"Öffnungszeiten%@", [institution getOpeningHours]);
 
                         
                         
@@ -247,6 +249,7 @@ long lastPushNotificationTimeStamp;
     {
         openedFromNotification=YES;
         [firstView newInstitution:lastPush];
+        [self.firstView.navigationController popToRootViewControllerAnimated:YES];
         NSLog(@"YES");
         firststart=false;
     }
